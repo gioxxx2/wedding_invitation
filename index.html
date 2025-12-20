@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的婚礼邀请函</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 介绍部分 -->
+    <section id="introduction" class="section introduction">
+        <div class="container">
+            <div class="intro-content">
+                <h1 class="main-title">我们结婚啦</h1>
+                <div class="couple-names">
+                    <span class="name">新郎</span>
+                    <span class="heart">❤</span>
+                    <span class="name">新娘</span>
+                </div>
+                <p class="date">2024年XX月XX日</p>
+                <p class="invitation-text">
+                    诚挚邀请您参加我们的婚礼<br>
+                    见证我们人生中最重要的时刻<br>
+                    您的到来将是我们最大的荣幸
+                </p>
+                <div class="scroll-indicator">
+                    <span>向下滑动查看更多</span>
+                    <div class="arrow">↓</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 图片上传展示部分 -->
+    <section id="photos" class="section photos">
+        <div class="container">
+            <h2 class="section-title">美好回忆</h2>
+            <div class="upload-section">
+                <label for="photo-upload" class="upload-btn">
+                    <span>📷 上传照片</span>
+                    <input type="file" id="photo-upload" accept="image/*" multiple>
+                </label>
+            </div>
+            <div id="photo-gallery" class="photo-gallery">
+                <!-- 照片将动态添加到这里 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 视频上传展示部分 -->
+    <section id="video" class="section video">
+        <div class="container">
+            <h2 class="section-title">我们的故事</h2>
+            <div class="upload-section">
+                <label for="video-upload" class="upload-btn">
+                    <span>🎬 上传视频</span>
+                    <input type="file" id="video-upload" accept="video/*">
+                </label>
+            </div>
+            <div id="video-container" class="video-container">
+                <!-- 视频将动态添加到这里 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 婚礼地址部分 -->
+    <section id="location" class="section location">
+        <div class="container">
+            <h2 class="section-title">婚礼地点</h2>
+            <div class="location-info">
+                <div class="address-card">
+                    <h3>📍 地址信息</h3>
+                    <p class="venue-name">婚礼酒店名称</p>
+                    <p class="address">详细地址：XX省XX市XX区XX路XX号</p>
+                    <p class="time">时间：2024年XX月XX日 XX:XX</p>
+                    <a href="#" id="map-link" class="map-link" target="_blank">查看地图</a>
+                </div>
+                <div id="map-container" class="map-container">
+                    <!-- 地图将显示在这里 -->
+                    <iframe 
+                        id="map-iframe"
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0" 
+                        style="border:0"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 导航菜单 -->
+    <nav class="nav-menu">
+        <a href="#introduction" class="nav-item active">介绍</a>
+        <a href="#photos" class="nav-item">照片</a>
+        <a href="#video" class="nav-item">视频</a>
+        <a href="#location" class="nav-item">地址</a>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
