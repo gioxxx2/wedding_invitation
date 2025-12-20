@@ -532,23 +532,29 @@ async function saveToGitHub(guests) {
         try {
             const getResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
                 headers: {
-                    'Authorization': `token ${githubToken}`,
+                    'Authorization': `Bearer ${githubToken}`,
                     'Accept': 'application/vnd.github.v3+json'
                 }
             });
             if (getResponse.ok) {
                 const fileData = await getResponse.json();
                 sha = fileData.sha;
+            } else if (getResponse.status === 404) {
+                // 文件不存在，继续创建新文件
+                console.log('文件不存在，将创建新文件');
+            } else {
+                const errorText = await getResponse.text();
+                console.error('获取文件失败:', getResponse.status, errorText);
             }
         } catch (e) {
-            // 文件不存在，继续创建新文件
+            console.error('获取文件出错:', e);
         }
         
         // 创建或更新文件
         const response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
             method: 'PUT',
             headers: {
-                'Authorization': `token ${githubToken}`,
+                'Authorization': `Bearer ${githubToken}`,
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
@@ -560,13 +566,69 @@ async function saveToGitHub(guests) {
         });
         
         if (response.ok) {
-            console.log('数据已保存到GitHub');
+            const result = await response.json();
+            console.log('✅ 数据已保存到GitHub:', result.commit.html_url);
+            // 显示成功提示
+            showGitHubSaveSuccess();
         } else {
-            console.error('保存到GitHub失败:', await response.text());
+            const errorText = await response.text();
+            console.error('❌ 保存到GitHub失败:', response.status, errorText);
+            // 显示错误提示
+            showGitHubSaveError(response.status, errorText);
         }
     } catch (error) {
         console.error('保存到GitHub出错:', error);
+        showGitHubSaveError('网络错误', error.message);
     }
+}
+
+// 显示GitHub保存成功提示
+function showGitHubSaveSuccess() {
+    const message = document.createElement('div');
+    message.className = 'success-message';
+    message.style.maxWidth = '400px';
+    message.innerHTML = `
+        <div class="success-icon">✅</div>
+        <div class="success-text">数据已同步到GitHub！</div>
+        <button class="close-btn" onclick="this.parentElement.remove()">确定</button>
+    `;
+    document.body.appendChild(message);
+    setTimeout(() => {
+        if (message.parentNode) {
+            message.remove();
+        }
+    }, 3000);
+}
+
+// 显示GitHub保存错误提示
+function showGitHubSaveError(status, errorText) {
+    let errorMsg = '保存失败';
+    if (status === 401) {
+        errorMsg = 'Token 无效或已过期，请重新设置';
+    } else if (status === 403) {
+        errorMsg = 'Token 权限不足，请确保有 repo 权限';
+    } else if (status === 404) {
+        errorMsg = '仓库不存在，请检查仓库名称';
+    } else {
+        errorMsg = `保存失败 (${status})`;
+    }
+    
+    const message = document.createElement('div');
+    message.className = 'success-message';
+    message.style.maxWidth = '400px';
+    message.style.background = '#fee';
+    message.innerHTML = `
+        <div class="success-icon">❌</div>
+        <div class="success-text">${errorMsg}</div>
+        <div style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">数据已保存在本地，不会丢失</div>
+        <button class="close-btn" onclick="this.parentElement.remove()">确定</button>
+    `;
+    document.body.appendChild(message);
+    setTimeout(() => {
+        if (message.parentNode) {
+            message.remove();
+        }
+    }, 5000);
 }
 
 // 设置GitHub Token
