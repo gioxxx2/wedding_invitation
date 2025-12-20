@@ -522,7 +522,7 @@ async function saveToGitHub(guests) {
     }
     
     try {
-        const repo = 'gioxxx2/wedding_invitation';
+        const repo = 'gioxxx2/wedding';
         const filePath = 'data/guests.json';
         const content = JSON.stringify(guests, null, 2);
         const encodedContent = btoa(unescape(encodeURIComponent(content)));
