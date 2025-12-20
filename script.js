@@ -423,8 +423,10 @@ function handleRSVPSubmit(e) {
         timestamp: new Date().toISOString()
     };
     
-    // 保存来宾信息
-    saveGuestData(guestData);
+    // 保存来宾信息（异步，但不阻塞）
+    saveGuestData(guestData).catch(err => {
+        console.error('保存数据出错:', err);
+    });
     
     // 如果有祝福语，显示弹幕
     if (guestData.blessing.trim()) {
@@ -500,11 +502,84 @@ function showSuccessMessage() {
     }, 3000);
 }
 
-// 保存来宾信息到本地存储
-function saveGuestData(guestData) {
+// 保存来宾信息到本地存储和GitHub
+async function saveGuestData(guestData) {
+    // 先保存到本地存储
     let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
     guests.push(guestData);
     localStorage.setItem('weddingGuests', JSON.stringify(guests));
+    
+    // 尝试保存到GitHub（如果配置了token）
+    await saveToGitHub(guests);
+}
+
+// 保存数据到GitHub
+async function saveToGitHub(guests) {
+    const githubToken = localStorage.getItem('githubToken');
+    if (!githubToken) {
+        // 如果没有配置token，只保存到本地
+        return;
+    }
+    
+    try {
+        const repo = 'gioxxx2/wedding_invitation';
+        const filePath = 'data/guests.json';
+        const content = JSON.stringify(guests, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(content)));
+        
+        // 先获取文件SHA（如果存在）
+        let sha = null;
+        try {
+            const getResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            if (getResponse.ok) {
+                const fileData = await getResponse.json();
+                sha = fileData.sha;
+            }
+        } catch (e) {
+            // 文件不存在，继续创建新文件
+        }
+        
+        // 创建或更新文件
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `更新来宾信息 - ${new Date().toLocaleString('zh-CN')}`,
+                content: encodedContent,
+                sha: sha
+            })
+        });
+        
+        if (response.ok) {
+            console.log('数据已保存到GitHub');
+        } else {
+            console.error('保存到GitHub失败:', await response.text());
+        }
+    } catch (error) {
+        console.error('保存到GitHub出错:', error);
+    }
+}
+
+// 设置GitHub Token
+function setGitHubToken() {
+    const currentToken = localStorage.getItem('githubToken') || '';
+    const token = prompt('请输入GitHub Personal Access Token（用于自动保存数据到GitHub）:\n\n注意：Token需要有repo权限\n留空则只保存到本地', currentToken);
+    if (token && token.trim()) {
+        localStorage.setItem('githubToken', token.trim());
+        alert('GitHub Token已设置！数据将自动保存到GitHub。');
+    } else if (token === '') {
+        localStorage.removeItem('githubToken');
+        alert('GitHub Token已清除，数据将只保存到本地。');
+    }
 }
 
 // 加载来宾信息
@@ -735,4 +810,5 @@ window.exportGuestData = exportToCSV;
 window.setTencentDocUrl = setTencentDocUrl;
 window.setTencentDocWebhook = setTencentDocWebhook;
 window.manualSyncToTencentDoc = manualSyncToTencentDoc;
+window.setGitHubToken = setGitHubToken;
 
