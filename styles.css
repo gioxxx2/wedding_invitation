@@ -35,12 +35,26 @@ body {
     color: var(--text-color);
     line-height: 1.6;
     overflow-x: hidden;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #fef5e7 0%, #ffe8d6 25%, #f5e6d3 50%, #e8d5c4 75%, #d4c5b8 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
     /* 微信浏览器兼容性 */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     visibility: visible;
     opacity: 1;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .section {
@@ -78,6 +92,16 @@ body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    animation: backgroundZoom 20s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundZoom {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
 }
 
 .intro-overlay {
@@ -125,6 +149,36 @@ body {
     animation: fadeInUp 1s ease-out;
     position: relative;
     z-index: 2;
+}
+
+.invitation-poem p {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.invitation-poem p:nth-child(1) { animation-delay: 0.2s; }
+.invitation-poem p:nth-child(2) { animation-delay: 0.4s; }
+.invitation-poem p:nth-child(3) { animation-delay: 0.6s; }
+.invitation-poem p:nth-child(4) { animation-delay: 0.8s; }
+
+.english-quote {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 1s forwards;
+}
+
+.couple-names {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 1.2s forwards;
+}
+
+.date-section {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 1.4s forwards;
+}
+
+.invitation-text {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out 1.6s forwards;
 }
 
 .invitation-poem {
@@ -314,7 +368,7 @@ body {
 
 /* 照片部分样式 */
 .photos {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    background: transparent;
 }
 
 .section-header {
@@ -393,9 +447,9 @@ body {
 .photo-gallery {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     margin-top: 2rem;
-    padding: 0 15px;
+    padding: 0;
     max-width: 100%;
 }
 
@@ -430,17 +484,27 @@ body {
 .photo-item {
     position: relative;
     overflow: hidden;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px var(--shadow);
+    border-radius: 0;
+    box-shadow: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
-    margin: 0 auto;
+    margin: 0;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
+.photo-item:nth-child(1) { animation-delay: 0.1s; }
+.photo-item:nth-child(2) { animation-delay: 0.2s; }
+.photo-item:nth-child(3) { animation-delay: 0.3s; }
+
 .photo-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+}
+
+.photo-item:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
 }
 
 .photo-item img {
@@ -448,6 +512,7 @@ body {
     height: auto;
     display: block;
     object-fit: cover;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .photo-item .delete-btn {
@@ -474,7 +539,9 @@ body {
 
 /* 视频部分样式 */
 .video {
-    background: var(--secondary-color);
+    background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 50%, #d4c5b8 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
 }
 
 .video-container {
@@ -541,7 +608,9 @@ body {
 
 /* 地址部分样式 */
 .location {
-    background: var(--white);
+    background: linear-gradient(135deg, #fff8f0 0%, #fef5e7 50%, #ffe8d6 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 14s ease infinite;
 }
 
 .location-info {
@@ -625,7 +694,9 @@ body {
 
 /* 爱情故事部分 */
 .story {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    background: linear-gradient(135deg, #fef5e7 0%, #ffe8d6 50%, #f5e6d3 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 12s ease infinite;
 }
 
 .story-timeline {
@@ -730,12 +801,13 @@ body {
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: 12px 20px;
     border-radius: 50px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
     z-index: 1000;
-    backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
@@ -810,7 +882,9 @@ body {
 
 /* 来宾信息收集部分 */
 .rsvp {
-    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    background: linear-gradient(135deg, #fef5e7 0%, #ffe8d6 50%, #f5e6d3 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 16s ease infinite;
     padding-bottom: 180px; /* 为底部导航菜单留出更多空间 */
 }
 
@@ -852,13 +926,14 @@ body {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 12px 18px;
+    padding: 14px 20px;
     border: 2px solid #e0e0e0;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1rem;
     font-family: 'Noto Serif SC', serif;
-    transition: all 0.3s ease;
-    background: var(--white);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(to bottom, #ffffff, #fafafa);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .form-group input:focus,
@@ -866,7 +941,9 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+    box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15), 0 4px 12px rgba(212, 165, 116, 0.2);
+    background: var(--white);
+    transform: translateY(-2px);
 }
 
 .form-group textarea {
@@ -1225,16 +1302,31 @@ body {
     }
 
     .photo-gallery {
-        padding: 0 10px;
-        gap: 15px;
+        padding: 0;
+        gap: 0;
+        margin-top: 0;
     }
     
     .photo-item {
-        border-radius: 12px;
+        border-radius: 0;
+        margin: 0;
     }
     
     .photo-item img {
-        border-radius: 12px;
+        border-radius: 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+    }
+    
+    .photos {
+        padding: 0;
+    }
+    
+    .photos .section-header {
+        padding: 40px 20px 20px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        margin-bottom: 0;
     }
 
     .video-container {
