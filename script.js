@@ -43,14 +43,11 @@ window.addEventListener('scroll', () => {
 // 照片展示功能 - 从GitHub仓库加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// 精选的6张图片（可以根据需要调整）
+// 按顺序展示的图片
 const selectedPhotos = [
-    'picture/7E7A4034.jpg',
-    'picture/7E7A4051.jpg',
-    'picture/7E7A4101.jpg',
-    'picture/7E7A4207.jpg',
-    'picture/7E7A4325.jpg',
-    'picture/7E7A4521.jpg'
+    'picture/1.jpg',
+    'picture/2.jpg',
+    'picture/3.jpg'
 ];
 
 // 从GitHub仓库加载照片
