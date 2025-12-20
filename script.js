@@ -381,19 +381,26 @@ const rsvpForm = document.getElementById('rsvp-form');
 const danmakuContainer = document.getElementById('danmaku-container');
 const viewTableLink = document.getElementById('view-table-link');
 
-// 腾讯文档表格链接（需要用户创建后替换）
-let tencentDocUrl = '';
+// 腾讯文档表格链接
+let tencentDocUrl = 'https://docs.qq.com/sheet/DRnBXenpEekVHdlBw?no_promotion=1&is_blank_or_template=blank&tab=BB08J2';
 
 // 初始化RSVP功能
 function initRSVP() {
     // 加载已保存的来宾信息
     loadGuestData();
     
-    // 检查是否有腾讯文档链接
+    // 检查是否有保存的腾讯文档链接，否则使用默认链接
     const savedUrl = localStorage.getItem('tencentDocUrl');
     if (savedUrl) {
         tencentDocUrl = savedUrl;
-        viewTableLink.href = savedUrl;
+    } else {
+        // 使用用户提供的默认链接
+        localStorage.setItem('tencentDocUrl', tencentDocUrl);
+    }
+    
+    // 设置查看链接
+    if (viewTableLink) {
+        viewTableLink.href = tencentDocUrl;
         viewTableLink.style.display = 'inline-block';
     }
     
@@ -536,41 +543,177 @@ function exportToCSV() {
 }
 
 // 同步到腾讯文档
-function syncToTencentDoc(guestData) {
-    // 方法1: 使用腾讯文档Webhook（需要配置）
-    // 如果用户配置了Webhook URL，可以自动同步
+async function syncToTencentDoc(guestData) {
+    // 由于腾讯文档没有公开API，我们使用以下方案：
     
-    // 方法2: 使用腾讯文档API（需要申请）
-    // 这里提供一个示例，实际使用时需要替换为真实的API
-    
-    // 方法3: 导出数据，用户可以手动导入到腾讯文档
-    // 我们已经在本地存储了数据，用户可以导出CSV后导入腾讯文档
-    
-    // 检查是否有配置的腾讯文档链接
+    // 方案1: 尝试使用腾讯文档的Webhook（如果配置了）
     const webhookUrl = localStorage.getItem('tencentDocWebhook');
     if (webhookUrl) {
-        // 如果有Webhook，尝试发送数据
-        fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(guestData)
-        }).catch(err => {
-            console.log('同步到腾讯文档失败，数据已保存在本地', err);
-        });
+        try {
+            await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(guestData)
+            });
+            console.log('数据已同步到腾讯文档');
+            return;
+        } catch (err) {
+            console.log('Webhook同步失败，使用其他方案', err);
+        }
     }
+    
+    // 方案2: 使用腾讯轻联或第三方服务（需要配置）
+    // 这里可以集成腾讯轻联的API
+    
+    // 方案3: 将数据添加到待同步队列
+    addToSyncQueue(guestData);
+    
+    // 方案4: 提示用户手动复制或导出
+    // 数据已保存在本地存储，用户可以导出CSV后手动导入
+}
+
+// 待同步队列
+let syncQueue = [];
+
+// 添加到同步队列
+function addToSyncQueue(guestData) {
+    syncQueue.push(guestData);
+    localStorage.setItem('syncQueue', JSON.stringify(syncQueue));
+    
+    // 尝试批量同步
+    tryBatchSync();
+}
+
+// 尝试批量同步
+async function tryBatchSync() {
+    if (syncQueue.length === 0) return;
+    
+    // 这里可以尝试使用各种方法同步数据
+    // 例如：通过第三方服务、Webhook等
+    
+    // 目前先保存到本地，用户可以手动导出
+    console.log('待同步数据:', syncQueue);
+}
+
+// 加载同步队列
+function loadSyncQueue() {
+    const saved = localStorage.getItem('syncQueue');
+    if (saved) {
+        syncQueue = JSON.parse(saved);
+    }
+}
+
+// 手动同步所有数据到腾讯文档（通过复制功能）
+function manualSyncToTencentDoc() {
+    const guests = loadGuestData();
+    if (guests.length === 0) {
+        alert('暂无数据需要同步');
+        return;
+    }
+    
+    // 生成表格格式的数据（使用Tab分隔，方便粘贴到腾讯文档）
+    const tableData = guests.map(guest => {
+        return [
+            guest.name || '',
+            guest.phone || '',
+            guest.count || '',
+            guest.blessing || '',
+            new Date(guest.timestamp).toLocaleString('zh-CN')
+        ].join('\t');
+    }).join('\n');
+    
+    // 复制到剪贴板（使用现代API）
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tableData).then(() => {
+            // 打开腾讯文档
+            window.open(tencentDocUrl, '_blank');
+            
+            // 显示提示
+            showSyncInstructions();
+        }).catch(err => {
+            // 降级方案：使用传统方法
+            fallbackCopyToClipboard(tableData);
+        });
+    } else {
+        // 降级方案
+        fallbackCopyToClipboard(tableData);
+    }
+}
+
+// 降级复制方法
+function fallbackCopyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        window.open(tencentDocUrl, '_blank');
+        showSyncInstructions();
+    } catch (err) {
+        alert('复制失败，请手动复制数据');
+        console.error('复制失败:', err);
+    }
+    document.body.removeChild(textarea);
+}
+
+// 显示同步说明
+function showSyncInstructions() {
+    const message = document.createElement('div');
+    message.className = 'success-message';
+    message.style.maxWidth = '500px';
+    message.innerHTML = `
+        <div class="success-icon">📋</div>
+        <div class="success-text" style="text-align: left; margin: 1rem 0;">
+            <strong>数据已复制到剪贴板！</strong><br><br>
+            <strong>操作步骤：</strong><br>
+            1. 在腾讯文档表格中，选中要粘贴的起始单元格（建议从第2行开始，第1行是表头）<br>
+            2. 按 <strong>Ctrl+V</strong> (Windows) 或 <strong>Cmd+V</strong> (Mac) 粘贴数据<br>
+            3. 数据会自动填充到表格中<br><br>
+            <strong>数据格式：</strong><br>
+            姓名 | 电话 | 参加人数 | 祝福语 | 提交时间
+        </div>
+        <button class="close-btn" onclick="this.parentElement.remove()">我知道了</button>
+    `;
+    document.body.appendChild(message);
+    
+    // 10秒后自动关闭
+    setTimeout(() => {
+        if (message.parentNode) {
+            message.remove();
+        }
+    }, 10000);
 }
 
 // 设置腾讯文档链接
 function setTencentDocUrl() {
-    const url = prompt('请输入您的腾讯文档表格链接：');
+    const currentUrl = tencentDocUrl || '';
+    const url = prompt('请输入您的腾讯文档表格链接：', currentUrl);
     if (url && url.trim()) {
         tencentDocUrl = url.trim();
         localStorage.setItem('tencentDocUrl', tencentDocUrl);
-        viewTableLink.href = tencentDocUrl;
-        viewTableLink.style.display = 'inline-block';
+        if (viewTableLink) {
+            viewTableLink.href = tencentDocUrl;
+            viewTableLink.style.display = 'inline-block';
+        }
         alert('腾讯文档链接已设置！');
+    }
+}
+
+// 设置腾讯文档Webhook（如果使用第三方服务）
+function setTencentDocWebhook() {
+    const currentWebhook = localStorage.getItem('tencentDocWebhook') || '';
+    const webhook = prompt('请输入腾讯文档Webhook URL（可选，用于自动同步）：', currentWebhook);
+    if (webhook && webhook.trim()) {
+        localStorage.setItem('tencentDocWebhook', webhook.trim());
+        alert('Webhook已设置！');
+    } else if (webhook === '') {
+        localStorage.removeItem('tencentDocWebhook');
+        alert('Webhook已清除！');
     }
 }
 
@@ -589,7 +732,12 @@ window.addEventListener('load', () => {
     });
 });
 
+// 页面加载时加载同步队列
+loadSyncQueue();
+
 // 添加导出功能到页面（可选，可以通过控制台调用）
 window.exportGuestData = exportToCSV;
 window.setTencentDocUrl = setTencentDocUrl;
+window.setTencentDocWebhook = setTencentDocWebhook;
+window.manualSyncToTencentDoc = manualSyncToTencentDoc;
 
