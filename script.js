@@ -542,11 +542,12 @@ function exportToCSV() {
     link.click();
 }
 
-// 同步到腾讯文档
+// 同步到腾讯文档（保留功能，但主要使用数据查看页面）
 async function syncToTencentDoc(guestData) {
-    // 由于腾讯文档没有公开API，我们使用以下方案：
+    // 数据已自动保存到本地存储
+    // 用户可以通过 data-viewer.html 页面查看和管理所有数据
     
-    // 方案1: 尝试使用腾讯文档的Webhook（如果配置了）
+    // 可选：尝试使用腾讯文档的Webhook（如果配置了）
     const webhookUrl = localStorage.getItem('tencentDocWebhook');
     if (webhookUrl) {
         try {
@@ -560,18 +561,12 @@ async function syncToTencentDoc(guestData) {
             console.log('数据已同步到腾讯文档');
             return;
         } catch (err) {
-            console.log('Webhook同步失败，使用其他方案', err);
+            console.log('Webhook同步失败', err);
         }
     }
     
-    // 方案2: 使用腾讯轻联或第三方服务（需要配置）
-    // 这里可以集成腾讯轻联的API
-    
-    // 方案3: 将数据添加到待同步队列
-    addToSyncQueue(guestData);
-    
-    // 方案4: 提示用户手动复制或导出
-    // 数据已保存在本地存储，用户可以导出CSV后手动导入
+    // 数据已保存，可以通过 data-viewer.html 查看
+    console.log('数据已保存，可通过数据查看页面查看');
 }
 
 // 待同步队列
