@@ -689,6 +689,252 @@ body {
     }
 }
 
+/* 来宾信息收集部分 */
+.rsvp {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+}
+
+.rsvp-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.rsvp-form {
+    background: var(--white);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.optional {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Noto Serif SC', serif;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: var(--white);
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+    font-family: 'Noto Serif SC', serif;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 165, 116, 0.6);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-icon {
+    font-size: 1.3rem;
+}
+
+.rsvp-info {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.info-text {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.rsvp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.table-link {
+    display: inline-block;
+    padding: 12px 25px;
+    background: var(--white);
+    color: var(--primary-color);
+    text-decoration: none;
+    border-radius: 50px;
+    border: 2px solid var(--primary-color);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-family: 'Noto Serif SC', serif;
+}
+
+.table-link:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.table-link button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+/* 弹幕容器 */
+.danmaku-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.danmaku-item {
+    position: absolute;
+    white-space: nowrap;
+    font-size: 1.2rem;
+    color: var(--white);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    padding: 8px 20px;
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.9), rgba(200, 159, 127, 0.9));
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: danmakuMove 15s linear forwards;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.danmaku-item:hover {
+    transform: scale(1.1);
+}
+
+.danmaku-item::before {
+    content: '💕';
+    margin-right: 8px;
+}
+
+@keyframes danmakuMove {
+    from {
+        left: 100%;
+    }
+    to {
+        left: -100%;
+    }
+}
+
+/* 成功提示 */
+.success-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--white);
+    padding: 2rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    text-align: center;
+    animation: fadeInScale 0.3s ease;
+}
+
+.success-message .success-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.success-message .success-text {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.success-message .close-btn {
+    padding: 10px 25px;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.success-message .close-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .main-title {
@@ -759,6 +1005,19 @@ body {
 
     .flower-decoration {
         font-size: 2rem;
+    }
+
+    .rsvp-form {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .danmaku-item {
+        font-size: 1rem;
+        padding: 6px 15px;
     }
 }
 

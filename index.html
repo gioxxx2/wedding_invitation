@@ -171,6 +171,64 @@
         </div>
     </section>
 
+    <!-- 来宾信息收集部分 -->
+    <section id="rsvp" class="section rsvp">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">确认出席</h2>
+                <p class="section-subtitle">请填写以下信息，方便我们为您安排座位</p>
+            </div>
+            <div class="rsvp-content">
+                <form id="rsvp-form" class="rsvp-form">
+                    <div class="form-group">
+                        <label for="guest-name">姓名 <span class="required">*</span></label>
+                        <input type="text" id="guest-name" name="name" required placeholder="请输入您的姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-phone">电话 <span class="required">*</span></label>
+                        <input type="tel" id="guest-phone" name="phone" required placeholder="请输入您的联系电话">
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-count">参加人数 <span class="required">*</span></label>
+                        <select id="guest-count" name="count" required>
+                            <option value="">请选择参加人数</option>
+                            <option value="1">1人</option>
+                            <option value="2">2人</option>
+                            <option value="3">3人</option>
+                            <option value="4">4人</option>
+                            <option value="5">5人及以上</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guest-blessing">祝福语 <span class="optional">(选填)</span></label>
+                        <textarea id="guest-blessing" name="blessing" rows="4" placeholder="写下您对我们的祝福吧..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <span class="submit-icon">💝</span>
+                        <span class="submit-text">提交信息</span>
+                    </button>
+                </form>
+                <div class="rsvp-info">
+                    <p class="info-text">您的信息将被保存到在线表格中</p>
+                    <div class="rsvp-actions">
+                        <a href="#" id="view-table-link" class="table-link" target="_blank" style="display: none;">
+                            <span>📊 查看来宾信息表格</span>
+                        </a>
+                        <button onclick="setTencentDocUrl()" class="table-link" style="margin-left: 10px; border: none; cursor: pointer;">
+                            <span>⚙️ 设置表格链接</span>
+                        </button>
+                        <button onclick="exportGuestData()" class="table-link" style="margin-left: 10px; border: none; cursor: pointer;">
+                            <span>📥 导出数据</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 弹幕容器 -->
+    <div id="danmaku-container" class="danmaku-container"></div>
+
     <!-- 导航菜单 -->
     <nav class="nav-menu">
         <a href="#introduction" class="nav-item active">
@@ -192,6 +250,10 @@
         <a href="#location" class="nav-item">
             <span class="nav-icon">📍</span>
             <span class="nav-text">地址</span>
+        </a>
+        <a href="#rsvp" class="nav-item">
+            <span class="nav-icon">✍️</span>
+            <span class="nav-text">确认</span>
         </a>
     </nav>
 

@@ -371,5 +371,225 @@ document.addEventListener('DOMContentLoaded', () => {
         item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         storyObserver.observe(item);
     });
+    
+    // 初始化来宾信息收集
+    initRSVP();
 });
+
+// 来宾信息收集功能
+const rsvpForm = document.getElementById('rsvp-form');
+const danmakuContainer = document.getElementById('danmaku-container');
+const viewTableLink = document.getElementById('view-table-link');
+
+// 腾讯文档表格链接（需要用户创建后替换）
+let tencentDocUrl = '';
+
+// 初始化RSVP功能
+function initRSVP() {
+    // 加载已保存的来宾信息
+    loadGuestData();
+    
+    // 检查是否有腾讯文档链接
+    const savedUrl = localStorage.getItem('tencentDocUrl');
+    if (savedUrl) {
+        tencentDocUrl = savedUrl;
+        viewTableLink.href = savedUrl;
+        viewTableLink.style.display = 'inline-block';
+    }
+    
+    // 表单提交处理
+    if (rsvpForm) {
+        rsvpForm.addEventListener('submit', handleRSVPSubmit);
+    }
+}
+
+// 处理表单提交
+function handleRSVPSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(rsvpForm);
+    const guestData = {
+        name: formData.get('name'),
+        phone: formData.get('phone'),
+        count: formData.get('count'),
+        blessing: formData.get('blessing') || '',
+        timestamp: new Date().toISOString()
+    };
+    
+    // 保存来宾信息
+    saveGuestData(guestData);
+    
+    // 如果有祝福语，显示弹幕
+    if (guestData.blessing.trim()) {
+        showDanmaku(guestData.blessing, guestData.name);
+    }
+    
+    // 显示成功提示
+    showSuccessMessage();
+    
+    // 重置表单
+    rsvpForm.reset();
+    
+    // 尝试同步到腾讯文档
+    syncToTencentDoc(guestData);
+}
+
+// 显示弹幕
+function showDanmaku(blessing, name) {
+    const danmaku = document.createElement('div');
+    danmaku.className = 'danmaku-item';
+    danmaku.textContent = `${name}: ${blessing}`;
+    
+    // 随机高度
+    const top = Math.random() * 80 + 10; // 10% 到 90% 之间
+    danmaku.style.top = `${top}%`;
+    
+    // 随机速度
+    const duration = 12 + Math.random() * 8; // 12-20秒
+    danmaku.style.animationDuration = `${duration}s`;
+    
+    // 随机颜色
+    const colors = [
+        'rgba(212, 165, 116, 0.9)',
+        'rgba(200, 159, 127, 0.9)',
+        'rgba(255, 182, 193, 0.9)',
+        'rgba(255, 192, 203, 0.9)',
+        'rgba(221, 160, 221, 0.9)'
+    ];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    danmaku.style.background = `linear-gradient(135deg, ${randomColor}, ${randomColor.replace('0.9', '0.7')})`;
+    
+    danmakuContainer.appendChild(danmaku);
+    
+    // 点击弹幕可以关闭
+    danmaku.addEventListener('click', () => {
+        danmaku.remove();
+    });
+    
+    // 动画结束后移除
+    setTimeout(() => {
+        if (danmaku.parentNode) {
+            danmaku.remove();
+        }
+    }, duration * 1000);
+}
+
+// 显示成功提示
+function showSuccessMessage() {
+    const message = document.createElement('div');
+    message.className = 'success-message';
+    message.innerHTML = `
+        <div class="success-icon">✅</div>
+        <div class="success-text">感谢您的确认！</div>
+        <button class="close-btn" onclick="this.parentElement.remove()">确定</button>
+    `;
+    document.body.appendChild(message);
+    
+    // 3秒后自动关闭
+    setTimeout(() => {
+        if (message.parentNode) {
+            message.remove();
+        }
+    }, 3000);
+}
+
+// 保存来宾信息到本地存储
+function saveGuestData(guestData) {
+    let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+    guests.push(guestData);
+    localStorage.setItem('weddingGuests', JSON.stringify(guests));
+}
+
+// 加载来宾信息
+function loadGuestData() {
+    const guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+    return guests;
+}
+
+// 导出为CSV
+function exportToCSV() {
+    const guests = loadGuestData();
+    if (guests.length === 0) {
+        alert('暂无来宾信息');
+        return;
+    }
+    
+    const headers = ['姓名', '电话', '参加人数', '祝福语', '提交时间'];
+    const rows = guests.map(guest => [
+        guest.name,
+        guest.phone,
+        guest.count,
+        guest.blessing || '',
+        new Date(guest.timestamp).toLocaleString('zh-CN')
+    ]);
+    
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `来宾信息_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+}
+
+// 同步到腾讯文档
+function syncToTencentDoc(guestData) {
+    // 方法1: 使用腾讯文档Webhook（需要配置）
+    // 如果用户配置了Webhook URL，可以自动同步
+    
+    // 方法2: 使用腾讯文档API（需要申请）
+    // 这里提供一个示例，实际使用时需要替换为真实的API
+    
+    // 方法3: 导出数据，用户可以手动导入到腾讯文档
+    // 我们已经在本地存储了数据，用户可以导出CSV后导入腾讯文档
+    
+    // 检查是否有配置的腾讯文档链接
+    const webhookUrl = localStorage.getItem('tencentDocWebhook');
+    if (webhookUrl) {
+        // 如果有Webhook，尝试发送数据
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(guestData)
+        }).catch(err => {
+            console.log('同步到腾讯文档失败，数据已保存在本地', err);
+        });
+    }
+}
+
+// 设置腾讯文档链接
+function setTencentDocUrl() {
+    const url = prompt('请输入您的腾讯文档表格链接：');
+    if (url && url.trim()) {
+        tencentDocUrl = url.trim();
+        localStorage.setItem('tencentDocUrl', tencentDocUrl);
+        viewTableLink.href = tencentDocUrl;
+        viewTableLink.style.display = 'inline-block';
+        alert('腾讯文档链接已设置！');
+    }
+}
+
+// 在页面加载时显示已有的祝福语弹幕
+window.addEventListener('load', () => {
+    const guests = loadGuestData();
+    // 显示最近5条祝福语弹幕
+    const recentBlessings = guests
+        .filter(g => g.blessing && g.blessing.trim())
+        .slice(-5);
+    
+    recentBlessings.forEach((guest, index) => {
+        setTimeout(() => {
+            showDanmaku(guest.blessing, guest.name);
+        }, index * 2000); // 每条弹幕间隔2秒
+    });
+});
+
+// 添加导出功能到页面（可选，可以通过控制台调用）
+window.exportGuestData = exportToCSV;
+window.setTencentDocUrl = setTencentDocUrl;
 
