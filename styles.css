@@ -79,6 +79,10 @@ body {
     position: relative;
     overflow: hidden;
     background: #000;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .intro-background-cover {
@@ -93,6 +97,13 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     animation: backgroundZoom 20s ease-in-out infinite alternate;
+}
+
+@media (max-width: 768px) {
+    .intro-background-cover {
+        background-size: cover;
+        background-position: center center;
+    }
 }
 
 @keyframes backgroundZoom {
@@ -463,6 +474,17 @@ body {
     opacity: 0.6;
 }
 
+.photo-placeholder-error {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .placeholder-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
@@ -490,8 +512,10 @@ body {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     margin: 0;
-    opacity: 0;
-    animation: fadeInUp 0.8s ease-out forwards;
+    min-height: 300px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: fadeInUp 0.8s ease-out forwards, loadingShimmer 1.5s infinite;
 }
 
 .photo-item:nth-child(1) { animation-delay: 0.1s; }
@@ -507,12 +531,43 @@ body {
     filter: brightness(1.1);
 }
 
+.photo-item.loaded {
+    background: transparent;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
 .photo-item img {
     width: 100%;
     height: auto;
     display: block;
     object-fit: cover;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.photo-item img.loaded {
+    opacity: 1;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes loadingShimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 .photo-item .delete-btn {
@@ -570,7 +625,7 @@ body {
 .video-item {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 177.78%; /* 9:16 aspect ratio for vertical video */
     background: #000;
 }
 
@@ -721,7 +776,14 @@ body {
     position: relative;
     margin-bottom: 4rem;
     width: 45%;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
 }
+
+.story-item:nth-child(1) { animation-delay: 0.1s; }
+.story-item:nth-child(3) { animation-delay: 0.3s; }
+.story-item:nth-child(5) { animation-delay: 0.5s; }
+.story-item:nth-child(7) { animation-delay: 0.7s; }
 
 .story-item.left {
     left: 0;
@@ -731,6 +793,41 @@ body {
 .story-item.right {
     left: 55%;
     text-align: left;
+}
+
+.story-image {
+    position: relative;
+    margin-bottom: 4rem;
+    width: 45%;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.story-image:nth-child(2) { animation-delay: 0.2s; }
+.story-image:nth-child(4) { animation-delay: 0.4s; }
+.story-image:nth-child(6) { animation-delay: 0.6s; }
+
+.story-image.left {
+    left: 0;
+}
+
+.story-image.right {
+    left: 55%;
+}
+
+.story-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    object-fit: cover;
+    display: block;
+}
+
+.story-image:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
 }
 
 .story-item::before {
@@ -754,12 +851,35 @@ body {
     left: -10px;
 }
 
+.story-image::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    border: 4px solid var(--white);
+    box-shadow: 0 0 0 3px var(--accent-color);
+    z-index: 2;
+}
+
+.story-image.left::before {
+    right: -10px;
+}
+
+.story-image.right::before {
+    left: -10px;
+}
+
 .story-content {
     background: var(--white);
-    padding: 2rem;
-    border-radius: 15px;
+    padding: 2.5rem;
+    border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(212, 165, 116, 0.1);
 }
 
 .story-content:hover {
@@ -1146,11 +1266,21 @@ body {
     /* 封面部分移动端优化 */
     .introduction {
         min-height: 100vh;
-        padding: 40px 15px;
+        padding: 20px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .intro-content {
-        padding: 20px 0;
+        padding: 10px 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .introduction .container {
+        padding: 0 10px;
+        width: 100%;
     }
 
     .invitation-poem {
@@ -1312,10 +1442,17 @@ body {
         margin: 0;
     }
     
-    .photo-item img {
-        border-radius: 0;
+    .photo-item {
         width: 100vw;
         margin-left: calc(-50vw + 50%);
+        left: 0;
+        right: 0;
+    }
+    
+    .photo-item img {
+        border-radius: 0;
+        width: 100%;
+        margin-left: 0;
     }
     
     .photos {
@@ -1336,7 +1473,7 @@ body {
     }
 
     .video-item {
-        padding-bottom: 56.25%; /* 保持16:9比例 */
+        padding-bottom: 177.78%; /* 竖屏9:16比例 */
     }
 
     .video-item video {
@@ -1358,11 +1495,30 @@ body {
         left: 0 !important;
         text-align: left !important;
         padding-left: 60px;
+        margin-bottom: 3rem;
     }
 
     .story-item::before {
         left: 10px !important;
         right: auto !important;
+    }
+
+    .story-image {
+        width: 100%;
+        left: 0 !important;
+        margin-bottom: 3rem;
+        padding: 0 10px;
+    }
+
+    .story-image::before {
+        left: 10px !important;
+        right: auto !important;
+        top: 20px;
+        transform: translateY(0);
+    }
+
+    .story-image img {
+        border-radius: 15px;
     }
 
     .flower-decoration {

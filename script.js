@@ -81,15 +81,35 @@ function addPhotoToGallery(photoSrc) {
     img.alt = '婚礼照片';
     img.loading = 'lazy'; // 懒加载优化
     
+    // 图片加载中显示占位符
+    img.onload = function() {
+        this.classList.add('loaded');
+        photoItem.classList.add('loaded');
+    };
+    
+    // 如果图片已经缓存，立即显示
+    if (img.complete && img.naturalHeight !== 0) {
+        img.classList.add('loaded');
+        photoItem.classList.add('loaded');
+    }
+    
     // 图片加载错误处理
     img.onerror = function() {
         console.error('图片加载失败:', photoSrc);
-        this.style.display = 'none';
+        // 显示占位图
+        photoItem.innerHTML = `
+            <div class="photo-placeholder-error">
+                <div class="placeholder-icon">📷</div>
+                <p class="placeholder-text">图片加载失败</p>
+            </div>
+        `;
     };
     
     // 点击照片查看大图
     photoItem.addEventListener('click', () => {
-        showPhotoModal(photoSrc);
+        if (img.complete && img.naturalHeight !== 0) {
+            showPhotoModal(photoSrc);
+        }
     });
     
     photoItem.appendChild(img);
@@ -171,11 +191,63 @@ function loadVideo() {
     videoContainer.appendChild(videoItem);
 }
 
-// 地图功能
-// 地址信息已在HTML中固定，不再需要动态加载和编辑功能
+// 地图功能 - 使用高德地图API
 function loadAddress() {
-    // 地址信息已在HTML中直接设置，地图iframe也已直接嵌入
-    // 此函数保留以保持代码兼容性，但不再执行任何操作
+    // 等待高德地图API加载完成
+    if (typeof AMap === 'undefined') {
+        setTimeout(loadAddress, 100);
+        return;
+    }
+    
+    // 初始化出阁之喜地点地图（深圳）
+    const chugeMapContainer = document.getElementById('map-container-chuge');
+    if (chugeMapContainer) {
+        const chugeMap = new AMap.Map('map-container-chuge', {
+            zoom: 16,
+            center: [113.946533, 22.540503], // 深圳圣丰城酒家坐标
+            viewMode: '3D'
+        });
+        
+        // 添加标记
+        const chugeMarker = new AMap.Marker({
+            position: [113.946533, 22.540503],
+            title: '圣丰城酒家（南山科技园店）'
+        });
+        chugeMap.add(chugeMarker);
+        
+        // 添加信息窗体
+        const chugeInfoWindow = new AMap.InfoWindow({
+            content: '<div style="padding: 10px;"><h3>圣丰城酒家（南山科技园店）</h3><p>广东省深圳市南山区讯美科技广场</p></div>'
+        });
+        chugeMarker.on('click', () => {
+            chugeInfoWindow.open(chugeMap, chugeMarker.getPosition());
+        });
+    }
+    
+    // 初始化婚典之约地点地图（海口）
+    const hunyanMapContainer = document.getElementById('map-container-hunyan');
+    if (hunyanMapContainer) {
+        const hunyanMap = new AMap.Map('map-container-hunyan', {
+            zoom: 16,
+            center: [110.330802, 20.022071], // 海口宝华海景大酒店坐标
+            viewMode: '3D'
+        });
+        
+        // 添加标记
+        const hunyanMarker = new AMap.Marker({
+            position: [110.330802, 20.022071],
+            title: '宝华海景大酒店（龙华店）'
+        });
+        hunyanMap.add(hunyanMarker);
+        
+        // 添加信息窗体
+        const hunyanInfoWindow = new AMap.InfoWindow({
+            content: '<div style="padding: 10px;"><h3>宝华海景大酒店（龙华店）</h3><p>海南省海口市龙华区滨海大道</p></div>'
+        });
+        hunyanMarker.on('click', () => {
+            hunyanInfoWindow.open(hunyanMap, hunyanMarker.getPosition());
+        });
+    }
 }
 
 // 微信浏览器检测和兼容性处理
