@@ -318,6 +318,23 @@ document.querySelectorAll('.address-card p').forEach(p => {
     }
 });
 
+// 微信浏览器检测和兼容性处理
+function isWeChatBrowser() {
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf('micromessenger') !== -1;
+}
+
+// 微信浏览器兼容性修复
+if (isWeChatBrowser()) {
+    // 禁用微信浏览器的默认行为
+    document.addEventListener('WeixinJSBridgeReady', function() {
+        // 微信 JS-SDK 准备就绪
+    }, false);
+    
+    // 确保页面可见
+    document.body.style.visibility = 'visible';
+}
+
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', () => {
     const savedPhotos = localStorage.getItem('weddingPhotos');

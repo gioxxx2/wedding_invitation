@@ -15,11 +15,16 @@
 }
 
 body {
-    font-family: 'Noto Serif SC', serif;
+    font-family: 'Noto Serif SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', serif;
     color: var(--text-color);
     line-height: 1.6;
     overflow-x: hidden;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    /* 微信浏览器兼容性 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    visibility: visible;
+    opacity: 1;
 }
 
 .section {
