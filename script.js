@@ -283,6 +283,7 @@ function handleRSVPSubmit(e) {
         name: formData.get('name'),
         phone: formData.get('phone'),
         count: formData.get('count'),
+        location: formData.get('location'),
         blessing: formData.get('blessing') || '',
         timestamp: new Date().toISOString()
     };
@@ -525,11 +526,12 @@ function exportToCSV() {
         return;
     }
     
-    const headers = ['姓名', '电话', '参加人数', '祝福语', '提交时间'];
+    const headers = ['姓名', '电话', '参加人数', '参加地点', '祝福语', '提交时间'];
     const rows = guests.map(guest => [
         guest.name,
         guest.phone,
         guest.count,
+        guest.location || '',
         guest.blessing || '',
         new Date(guest.timestamp).toLocaleString('zh-CN')
     ]);

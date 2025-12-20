@@ -228,6 +228,7 @@
             html += '<th>姓名</th>';
             html += '<th>电话</th>';
             html += '<th>参加人数</th>';
+            html += '<th>参加地点</th>';
             html += '<th>祝福语</th>';
             html += '<th>提交时间</th>';
             html += '</tr></thead><tbody>';
@@ -238,6 +239,7 @@
                 html += `<td>${escapeHtml(guest.name || '')}</td>`;
                 html += `<td>${escapeHtml(guest.phone || '')}</td>`;
                 html += `<td>${guest.count || '1'}人</td>`;
+                html += `<td>${escapeHtml(guest.location || '')}</td>`;
                 html += `<td class="blessing-cell" title="${escapeHtml(guest.blessing || '')}">${escapeHtml(guest.blessing || '无')}</td>`;
                 html += `<td>${new Date(guest.timestamp).toLocaleString('zh-CN')}</td>`;
                 html += '</tr>';
