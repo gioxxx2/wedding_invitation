@@ -172,78 +172,11 @@ function loadVideo() {
 }
 
 // 地图功能
-const mapLink = document.getElementById('map-link');
-const mapIframe = document.getElementById('map-iframe');
-
-// 默认地址（可以修改）
-const defaultAddress = {
-    name: '婚礼酒店名称',
-    address: 'XX省XX市XX区XX路XX号',
-    time: '2024年XX月XX日 XX:XX',
-    // 使用百度地图或高德地图的嵌入URL
-    // 这里使用百度地图作为示例，您需要替换为实际地址的坐标
-    mapUrl: 'https://map.baidu.com/?newmap=1&ie=utf-8&s=s%26wd%3D%E5%8C%97%E4%BA%AC%E5%B8%82'
-};
-
-// 更新地址信息
-function updateAddressInfo(address) {
-    const venueName = document.querySelector('.venue-name');
-    const addressText = document.querySelector('.address');
-    const timeText = document.querySelector('.time');
-    
-    if (venueName) venueName.textContent = address.name;
-    if (addressText) addressText.textContent = `详细地址：${address.address}`;
-    if (timeText) timeText.textContent = `时间：${address.time}`;
-    
-    // 更新地图链接（使用百度地图搜索）
-    if (mapLink) {
-        mapLink.href = `https://map.baidu.com/search/${encodeURIComponent(address.address)}`;
-    }
-    
-    // 更新地图iframe（使用百度地图嵌入）
-    if (mapIframe) {
-        // 注意：实际使用时需要获取准确的经纬度坐标
-        // 这里使用百度地图的搜索URL作为示例
-        mapIframe.src = `https://map.baidu.com/?newmap=1&ie=utf-8&s=s%26wd%3D${encodeURIComponent(address.address)}`;
-    }
-}
-
-// 从本地存储加载地址信息
+// 地址信息已在HTML中固定，不再需要动态加载和编辑功能
 function loadAddress() {
-    const savedAddress = localStorage.getItem('weddingAddress');
-    if (savedAddress) {
-        const address = JSON.parse(savedAddress);
-        updateAddressInfo(address);
-    } else {
-        updateAddressInfo(defaultAddress);
-    }
+    // 地址信息已在HTML中直接设置，地图iframe也已直接嵌入
+    // 此函数保留以保持代码兼容性，但不再执行任何操作
 }
-
-// 保存地址信息
-function saveAddress(address) {
-    localStorage.setItem('weddingAddress', JSON.stringify(address));
-}
-
-// 允许用户编辑地址信息（双击编辑）
-document.querySelectorAll('.address-card p').forEach(p => {
-    if (p.classList.contains('venue-name') || p.classList.contains('address') || p.classList.contains('time')) {
-        p.addEventListener('dblclick', () => {
-            const currentText = p.textContent;
-            const newText = prompt('请输入新内容：', currentText);
-            if (newText && newText.trim()) {
-                p.textContent = newText;
-                // 保存更新后的地址信息
-                const address = {
-                    name: document.querySelector('.venue-name').textContent,
-                    address: document.querySelector('.address').textContent.replace('详细地址：', ''),
-                    time: document.querySelector('.time').textContent.replace('时间：', '')
-                };
-                saveAddress(address);
-                updateAddressInfo(address);
-            }
-        });
-    }
-});
 
 // 微信浏览器检测和兼容性处理
 function isWeChatBrowser() {
