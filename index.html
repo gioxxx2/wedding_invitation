@@ -46,19 +46,17 @@
 <body>
     <!-- 介绍部分 -->
     <section id="introduction" class="section introduction">
-        <div class="intro-background">
-            <div class="flower-decoration top-left">🌸</div>
-            <div class="flower-decoration top-right">🌺</div>
-            <div class="flower-decoration bottom-left">🌹</div>
-            <div class="flower-decoration bottom-right">🌷</div>
-        </div>
+        <div class="intro-background-cover"></div>
+        <div class="intro-overlay"></div>
         <div class="container">
             <div class="intro-content">
-                <div class="invitation-header">
-                    <p class="subtitle">诚挚邀请</p>
-                    <div class="divider-line"></div>
+                <div class="invitation-poem">
+                    <p class="poem-text">我们跨越了山川湖海、争吵误解</p>
+                    <p class="poem-text">投身这场以终身为期限的冒险</p>
+                    <p class="poem-text">诚挚邀请您来参加婚礼</p>
+                    <p class="poem-text">见证这场因爱而生的结合</p>
                 </div>
-                <h1 class="main-title">我们结婚啦</h1>
+                <p class="english-quote">My story is all about you</p>
                 <div class="couple-names">
                     <span class="name groom">徐智</span>
                     <span class="heart">💕</span>
@@ -70,13 +68,9 @@
                     <p class="time">XX:XX</p>
                 </div>
                 <div class="invitation-text">
-                    <p class="poem-line">执子之手，与子偕老</p>
-                    <p class="poem-line">愿与君共度此生</p>
-                    <p class="invitation-detail">
-                        诚挚邀请您参加我们的婚礼<br>
-                        见证我们人生中最重要的时刻<br>
-                        您的到来将是我们最大的荣幸
-                    </p>
+                    <p class="poem-line">春来夏往，秋收冬藏</p>
+                    <p class="poem-line">自此长路携手，岁月悠悠</p>
+                    <p class="love-formula">(喜+喜=我们)</p>
                 </div>
                 <div class="scroll-indicator">
                     <span>向下滑动查看更多</span>
@@ -127,51 +121,28 @@
         </div>
     </section>
 
-    <!-- 图片上传展示部分 -->
+    <!-- 图片展示部分 -->
     <section id="photos" class="section photos">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">美好回忆</h2>
                 <p class="section-subtitle">记录我们在一起的每一个美好瞬间</p>
             </div>
-            <div class="upload-section">
-                <label for="photo-upload" class="upload-btn">
-                    <span class="upload-icon">📷</span>
-                    <span class="upload-text">上传照片</span>
-                    <input type="file" id="photo-upload" accept="image/*" multiple>
-                </label>
-            </div>
             <div id="photo-gallery" class="photo-gallery">
-                <!-- 照片将动态添加到这里 -->
-                <div class="photo-placeholder">
-                    <div class="placeholder-icon">📸</div>
-                    <p class="placeholder-text">点击上方按钮上传照片</p>
-                    <p class="placeholder-hint">支持多张照片，建议上传横版或竖版照片</p>
-                </div>
+                <!-- 照片将从GitHub仓库加载 -->
             </div>
         </div>
     </section>
 
-    <!-- 视频上传展示部分 -->
+    <!-- 视频展示部分 -->
     <section id="video" class="section video">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">爱的见证</h2>
                 <p class="section-subtitle">用视频记录我们的爱情故事</p>
             </div>
-            <div class="upload-section">
-                <label for="video-upload" class="upload-btn">
-                    <span class="upload-icon">🎬</span>
-                    <span class="upload-text">上传视频</span>
-                    <input type="file" id="video-upload" accept="video/*">
-                </label>
-            </div>
             <div id="video-container" class="video-container">
-                <div class="video-placeholder">
-                    <div class="placeholder-icon">🎥</div>
-                    <p class="placeholder-text">点击上方按钮上传视频</p>
-                    <p class="placeholder-hint">支持 MP4、MOV 等常见视频格式</p>
-                </div>
+                <!-- 视频将从GitHub仓库加载 -->
             </div>
         </div>
     </section>

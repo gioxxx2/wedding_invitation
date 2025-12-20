@@ -40,19 +40,27 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// 照片上传功能
-const photoUpload = document.getElementById('photo-upload');
+// 照片展示功能 - 从GitHub仓库加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// 从本地存储加载照片
+// 精选的6张图片（可以根据需要调整）
+const selectedPhotos = [
+    'picture/7E7A4034.jpg',
+    'picture/7E7A4051.jpg',
+    'picture/7E7A4101.jpg',
+    'picture/7E7A4207.jpg',
+    'picture/7E7A4325.jpg',
+    'picture/7E7A4521.jpg'
+];
+
+// 从GitHub仓库加载照片
 function loadPhotos() {
-    const savedPhotos = localStorage.getItem('weddingPhotos');
-    if (savedPhotos) {
-        const photos = JSON.parse(savedPhotos);
-        photos.forEach(photoData => {
-            addPhotoToGallery(photoData);
-        });
-    }
+    if (!photoGallery) return;
+    
+    selectedPhotos.forEach((photoPath, index) => {
+        const photoUrl = photoPath; // 相对路径，GitHub Pages会自动解析
+        addPhotoToGallery(photoUrl);
+    });
 }
 
 // 保存照片到本地存储
@@ -66,11 +74,7 @@ function savePhotos() {
 
 // 添加照片到画廊
 function addPhotoToGallery(photoSrc) {
-    // 移除占位符
-    const placeholder = photoGallery.querySelector('.photo-placeholder');
-    if (placeholder) {
-        placeholder.remove();
-    }
+    if (!photoGallery) return;
     
     const photoItem = document.createElement('div');
     photoItem.className = 'photo-item';
@@ -78,29 +82,20 @@ function addPhotoToGallery(photoSrc) {
     const img = document.createElement('img');
     img.src = photoSrc;
     img.alt = '婚礼照片';
+    img.loading = 'lazy'; // 懒加载优化
     
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.innerHTML = '×';
-    deleteBtn.onclick = () => {
-        photoItem.remove();
-        savePhotos();
-        // 如果没有照片了，显示占位符
-        if (photoGallery.querySelectorAll('.photo-item').length === 0) {
-            showPhotoPlaceholder();
-        }
+    // 图片加载错误处理
+    img.onerror = function() {
+        console.error('图片加载失败:', photoSrc);
+        this.style.display = 'none';
     };
     
-    photoItem.appendChild(img);
-    photoItem.appendChild(deleteBtn);
-    
     // 点击照片查看大图
-    photoItem.addEventListener('click', (e) => {
-        if (e.target !== deleteBtn && e.target !== deleteBtn.firstChild) {
-            showPhotoModal(photoSrc);
-        }
+    photoItem.addEventListener('click', () => {
+        showPhotoModal(photoSrc);
     });
     
+    photoItem.appendChild(img);
     photoGallery.appendChild(photoItem);
 }
 
@@ -148,101 +143,36 @@ function showPhotoModal(photoSrc) {
     document.body.appendChild(modal);
 }
 
-// 处理照片上传
-photoUpload.addEventListener('change', (e) => {
-    const files = e.target.files;
-    
-    Array.from(files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                addPhotoToGallery(e.target.result);
-                savePhotos();
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    // 清空input，允许重复上传同一文件
-    e.target.value = '';
-});
+// 照片从GitHub仓库加载，不需要上传功能
 
-// 视频上传功能
-const videoUpload = document.getElementById('video-upload');
+// 视频展示功能 - 从GitHub仓库加载
 const videoContainer = document.getElementById('video-container');
 
-// 从本地存储加载视频
+// 从GitHub仓库加载视频
 function loadVideo() {
-    const savedVideo = localStorage.getItem('weddingVideo');
-    if (savedVideo) {
-        addVideoToContainer(savedVideo);
-    } else {
-        showVideoPlaceholder();
-    }
-}
-
-// 保存视频到本地存储
-function saveVideo(videoSrc) {
-    localStorage.setItem('weddingVideo', videoSrc);
-}
-
-// 添加视频到容器
-function addVideoToContainer(videoSrc) {
-    // 清除现有视频和占位符
-    videoContainer.innerHTML = '';
+    if (!videoContainer) return;
+    
+    const videoPath = 'video/徐智请柬无水印（2）.mp4';
+    const videoUrl = videoPath; // 相对路径，GitHub Pages会自动解析
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
     
     const video = document.createElement('video');
-    video.src = videoSrc;
+    video.src = videoUrl;
     video.controls = true;
+    video.playsInline = true; // 移动端内联播放
     video.style.cssText = 'width: 100%; height: 100%;';
     
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.innerHTML = '×';
-    deleteBtn.onclick = () => {
-        videoContainer.innerHTML = '';
-        localStorage.removeItem('weddingVideo');
-        showVideoPlaceholder();
+    // 视频加载错误处理
+    video.onerror = function() {
+        console.error('视频加载失败:', videoUrl);
+        videoContainer.innerHTML = '<div class="video-placeholder"><p>视频加载失败，请稍后重试</p></div>';
     };
     
     videoItem.appendChild(video);
-    videoItem.appendChild(deleteBtn);
     videoContainer.appendChild(videoItem);
 }
-
-// 显示视频占位符
-function showVideoPlaceholder() {
-    if (!videoContainer.querySelector('.video-placeholder')) {
-        const placeholder = document.createElement('div');
-        placeholder.className = 'video-placeholder';
-        placeholder.innerHTML = `
-            <div class="placeholder-icon">🎥</div>
-            <p class="placeholder-text">点击上方按钮上传视频</p>
-            <p class="placeholder-hint">支持 MP4、MOV 等常见视频格式</p>
-        `;
-        videoContainer.appendChild(placeholder);
-    }
-}
-
-// 处理视频上传
-videoUpload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    
-    if (file && file.type.startsWith('video/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            addVideoToContainer(e.target.result);
-            saveVideo(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    }
-    
-    // 清空input
-    e.target.value = '';
-});
 
 // 地图功能
 const mapLink = document.getElementById('map-link');
@@ -337,18 +267,8 @@ if (isWeChatBrowser()) {
 
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', () => {
-    const savedPhotos = localStorage.getItem('weddingPhotos');
-    if (savedPhotos) {
-        const photos = JSON.parse(savedPhotos);
-        if (photos.length > 0) {
-            loadPhotos();
-        } else {
-            showPhotoPlaceholder();
-        }
-    } else {
-        showPhotoPlaceholder();
-    }
-    
+    // 从GitHub仓库加载图片和视频
+    loadPhotos();
     loadVideo();
     loadAddress();
     
