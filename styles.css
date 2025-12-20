@@ -713,6 +713,7 @@ body {
 /* 来宾信息收集部分 */
 .rsvp {
     background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    padding-bottom: 120px; /* 为底部导航菜单留出空间 */
 }
 
 .rsvp-content {
@@ -1039,6 +1040,14 @@ body {
     .danmaku-item {
         font-size: 1rem;
         padding: 6px 15px;
+    }
+
+    .section:last-of-type {
+        padding-bottom: 100px;
+    }
+
+    .rsvp {
+        padding-bottom: 100px;
     }
 }
 
