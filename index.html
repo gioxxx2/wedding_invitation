@@ -12,20 +12,38 @@
 <body>
     <!-- 介绍部分 -->
     <section id="introduction" class="section introduction">
+        <div class="intro-background">
+            <div class="flower-decoration top-left">🌸</div>
+            <div class="flower-decoration top-right">🌺</div>
+            <div class="flower-decoration bottom-left">🌹</div>
+            <div class="flower-decoration bottom-right">🌷</div>
+        </div>
         <div class="container">
             <div class="intro-content">
+                <div class="invitation-header">
+                    <p class="subtitle">诚挚邀请</p>
+                    <div class="divider-line"></div>
+                </div>
                 <h1 class="main-title">我们结婚啦</h1>
                 <div class="couple-names">
-                    <span class="name">新郎</span>
-                    <span class="heart">❤</span>
-                    <span class="name">新娘</span>
+                    <span class="name groom">新郎</span>
+                    <span class="heart">💕</span>
+                    <span class="name bride">新娘</span>
                 </div>
-                <p class="date">2024年XX月XX日</p>
-                <p class="invitation-text">
-                    诚挚邀请您参加我们的婚礼<br>
-                    见证我们人生中最重要的时刻<br>
-                    您的到来将是我们最大的荣幸
-                </p>
+                <div class="date-section">
+                    <p class="date-label">良辰吉日</p>
+                    <p class="date">2024年XX月XX日</p>
+                    <p class="time">XX:XX</p>
+                </div>
+                <div class="invitation-text">
+                    <p class="poem-line">执子之手，与子偕老</p>
+                    <p class="poem-line">愿与君共度此生</p>
+                    <p class="invitation-detail">
+                        诚挚邀请您参加我们的婚礼<br>
+                        见证我们人生中最重要的时刻<br>
+                        您的到来将是我们最大的荣幸
+                    </p>
+                </div>
                 <div class="scroll-indicator">
                     <span>向下滑动查看更多</span>
                     <div class="arrow">↓</div>
@@ -34,18 +52,68 @@
         </div>
     </section>
 
+    <!-- 爱情故事部分 -->
+    <section id="story" class="section story">
+        <div class="container">
+            <h2 class="section-title">我们的故事</h2>
+            <div class="story-timeline">
+                <div class="story-item left">
+                    <div class="story-content">
+                        <div class="story-icon">💑</div>
+                        <h3 class="story-title">初次相遇</h3>
+                        <p class="story-date">2020年XX月</p>
+                        <p class="story-text">那是一个阳光明媚的午后，我们在咖啡厅里第一次相遇。你的笑容如春风般温暖，那一刻，我知道你就是我要找的那个人。</p>
+                    </div>
+                </div>
+                <div class="story-item right">
+                    <div class="story-content">
+                        <div class="story-icon">💕</div>
+                        <h3 class="story-title">相知相恋</h3>
+                        <p class="story-date">2021年XX月</p>
+                        <p class="story-text">我们一起走过春夏秋冬，分享彼此的喜怒哀乐。每一个平凡的日子，因为有你而变得特别。我们学会了理解、包容，也学会了爱。</p>
+                    </div>
+                </div>
+                <div class="story-item left">
+                    <div class="story-content">
+                        <div class="story-icon">💍</div>
+                        <h3 class="story-title">求婚时刻</h3>
+                        <p class="story-date">2023年XX月</p>
+                        <p class="story-text">在满天星空的见证下，我单膝跪地，向你许下一生的承诺。你眼含热泪说"我愿意"，那一刻，我们决定携手共度余生。</p>
+                    </div>
+                </div>
+                <div class="story-item right">
+                    <div class="story-content">
+                        <div class="story-icon">🎉</div>
+                        <h3 class="story-title">步入婚姻</h3>
+                        <p class="story-date">2024年XX月</p>
+                        <p class="story-text">今天，我们即将步入婚姻的殿堂。感谢所有关心我们的家人和朋友，感谢你们的祝福。愿我们的爱情如初见时那般美好，愿我们的未来充满幸福与甜蜜。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- 图片上传展示部分 -->
     <section id="photos" class="section photos">
         <div class="container">
-            <h2 class="section-title">美好回忆</h2>
+            <div class="section-header">
+                <h2 class="section-title">美好回忆</h2>
+                <p class="section-subtitle">记录我们在一起的每一个美好瞬间</p>
+            </div>
             <div class="upload-section">
                 <label for="photo-upload" class="upload-btn">
-                    <span>📷 上传照片</span>
+                    <span class="upload-icon">📷</span>
+                    <span class="upload-text">上传照片</span>
                     <input type="file" id="photo-upload" accept="image/*" multiple>
                 </label>
             </div>
             <div id="photo-gallery" class="photo-gallery">
                 <!-- 照片将动态添加到这里 -->
+                <div class="photo-placeholder">
+                    <div class="placeholder-icon">📸</div>
+                    <p class="placeholder-text">点击上方按钮上传照片</p>
+                    <p class="placeholder-hint">支持多张照片，建议上传横版或竖版照片</p>
+                </div>
             </div>
         </div>
     </section>
@@ -53,15 +121,23 @@
     <!-- 视频上传展示部分 -->
     <section id="video" class="section video">
         <div class="container">
-            <h2 class="section-title">我们的故事</h2>
+            <div class="section-header">
+                <h2 class="section-title">爱的见证</h2>
+                <p class="section-subtitle">用视频记录我们的爱情故事</p>
+            </div>
             <div class="upload-section">
                 <label for="video-upload" class="upload-btn">
-                    <span>🎬 上传视频</span>
+                    <span class="upload-icon">🎬</span>
+                    <span class="upload-text">上传视频</span>
                     <input type="file" id="video-upload" accept="video/*">
                 </label>
             </div>
             <div id="video-container" class="video-container">
-                <!-- 视频将动态添加到这里 -->
+                <div class="video-placeholder">
+                    <div class="placeholder-icon">🎥</div>
+                    <p class="placeholder-text">点击上方按钮上传视频</p>
+                    <p class="placeholder-hint">支持 MP4、MOV 等常见视频格式</p>
+                </div>
             </div>
         </div>
     </section>
@@ -97,10 +173,26 @@
 
     <!-- 导航菜单 -->
     <nav class="nav-menu">
-        <a href="#introduction" class="nav-item active">介绍</a>
-        <a href="#photos" class="nav-item">照片</a>
-        <a href="#video" class="nav-item">视频</a>
-        <a href="#location" class="nav-item">地址</a>
+        <a href="#introduction" class="nav-item active">
+            <span class="nav-icon">💌</span>
+            <span class="nav-text">邀请</span>
+        </a>
+        <a href="#story" class="nav-item">
+            <span class="nav-icon">📖</span>
+            <span class="nav-text">故事</span>
+        </a>
+        <a href="#photos" class="nav-item">
+            <span class="nav-icon">📷</span>
+            <span class="nav-text">照片</span>
+        </a>
+        <a href="#video" class="nav-item">
+            <span class="nav-icon">🎬</span>
+            <span class="nav-text">视频</span>
+        </a>
+        <a href="#location" class="nav-item">
+            <span class="nav-icon">📍</span>
+            <span class="nav-text">地址</span>
+        </a>
     </nav>
 
     <script src="script.js"></script>

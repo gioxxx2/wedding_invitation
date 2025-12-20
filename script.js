@@ -66,6 +66,12 @@ function savePhotos() {
 
 // 添加照片到画廊
 function addPhotoToGallery(photoSrc) {
+    // 移除占位符
+    const placeholder = photoGallery.querySelector('.photo-placeholder');
+    if (placeholder) {
+        placeholder.remove();
+    }
+    
     const photoItem = document.createElement('div');
     photoItem.className = 'photo-item';
     
@@ -79,6 +85,10 @@ function addPhotoToGallery(photoSrc) {
     deleteBtn.onclick = () => {
         photoItem.remove();
         savePhotos();
+        // 如果没有照片了，显示占位符
+        if (photoGallery.querySelectorAll('.photo-item').length === 0) {
+            showPhotoPlaceholder();
+        }
     };
     
     photoItem.appendChild(img);
@@ -92,6 +102,20 @@ function addPhotoToGallery(photoSrc) {
     });
     
     photoGallery.appendChild(photoItem);
+}
+
+// 显示照片占位符
+function showPhotoPlaceholder() {
+    if (!photoGallery.querySelector('.photo-placeholder')) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'photo-placeholder';
+        placeholder.innerHTML = `
+            <div class="placeholder-icon">📸</div>
+            <p class="placeholder-text">点击上方按钮上传照片</p>
+            <p class="placeholder-hint">支持多张照片，建议上传横版或竖版照片</p>
+        `;
+        photoGallery.appendChild(placeholder);
+    }
 }
 
 // 显示照片大图模态框
@@ -152,6 +176,8 @@ function loadVideo() {
     const savedVideo = localStorage.getItem('weddingVideo');
     if (savedVideo) {
         addVideoToContainer(savedVideo);
+    } else {
+        showVideoPlaceholder();
     }
 }
 
@@ -162,7 +188,7 @@ function saveVideo(videoSrc) {
 
 // 添加视频到容器
 function addVideoToContainer(videoSrc) {
-    // 清除现有视频
+    // 清除现有视频和占位符
     videoContainer.innerHTML = '';
     
     const videoItem = document.createElement('div');
@@ -179,11 +205,26 @@ function addVideoToContainer(videoSrc) {
     deleteBtn.onclick = () => {
         videoContainer.innerHTML = '';
         localStorage.removeItem('weddingVideo');
+        showVideoPlaceholder();
     };
     
     videoItem.appendChild(video);
     videoItem.appendChild(deleteBtn);
     videoContainer.appendChild(videoItem);
+}
+
+// 显示视频占位符
+function showVideoPlaceholder() {
+    if (!videoContainer.querySelector('.video-placeholder')) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'video-placeholder';
+        placeholder.innerHTML = `
+            <div class="placeholder-icon">🎥</div>
+            <p class="placeholder-text">点击上方按钮上传视频</p>
+            <p class="placeholder-hint">支持 MP4、MOV 等常见视频格式</p>
+        `;
+        videoContainer.appendChild(placeholder);
+    }
 }
 
 // 处理视频上传
@@ -279,7 +320,18 @@ document.querySelectorAll('.address-card p').forEach(p => {
 
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', () => {
-    loadPhotos();
+    const savedPhotos = localStorage.getItem('weddingPhotos');
+    if (savedPhotos) {
+        const photos = JSON.parse(savedPhotos);
+        if (photos.length > 0) {
+            loadPhotos();
+        } else {
+            showPhotoPlaceholder();
+        }
+    } else {
+        showPhotoPlaceholder();
+    }
+    
     loadVideo();
     loadAddress();
     
@@ -295,6 +347,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+    });
+    
+    // 添加故事时间线动画
+    const storyItems = document.querySelectorAll('.story-item');
+    const observerOptions = {
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const storyObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    storyItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(30px)';
+        item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        storyObserver.observe(item);
     });
 });
 
