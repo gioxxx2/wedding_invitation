@@ -37,12 +37,9 @@
             overflow-x: hidden;
         }
         
-        /* 微信浏览器字体加载优化 */
-        @font-face {
-            font-family: 'Noto Serif SC';
-            font-style: normal;
-            font-weight: 300;
-            font-display: swap;
+        /* 微信浏览器字体加载优化 - 使用系统字体作为后备 */
+        body {
+            font-family: 'Noto Serif SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', serif;
         }
     </style>
 </head>
