@@ -1047,7 +1047,11 @@ body {
     }
 
     .rsvp {
-        padding-bottom: 100px;
+        padding-bottom: 150px;
+    }
+
+    .section:last-of-type {
+        padding-bottom: 150px;
     }
 }
 
