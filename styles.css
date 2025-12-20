@@ -713,7 +713,7 @@ body {
 /* 来宾信息收集部分 */
 .rsvp {
     background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-    padding-bottom: 120px; /* 为底部导航菜单留出空间 */
+    padding-bottom: 180px; /* 为底部导航菜单留出更多空间 */
 }
 
 .rsvp-content {
