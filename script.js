@@ -379,34 +379,31 @@ document.addEventListener('DOMContentLoaded', () => {
 // 来宾信息收集功能
 const rsvpForm = document.getElementById('rsvp-form');
 const danmakuContainer = document.getElementById('danmaku-container');
-const viewTableLink = document.getElementById('view-table-link');
-
-// 腾讯文档表格链接
-let tencentDocUrl = 'https://docs.qq.com/sheet/DRnBXenpEekVHdlBw?no_promotion=1&is_blank_or_template=blank&tab=BB08J2';
 
 // 初始化RSVP功能
 function initRSVP() {
     // 加载已保存的来宾信息
     loadGuestData();
     
-    // 检查是否有保存的腾讯文档链接，否则使用默认链接
-    const savedUrl = localStorage.getItem('tencentDocUrl');
-    if (savedUrl) {
-        tencentDocUrl = savedUrl;
-    } else {
-        // 使用用户提供的默认链接
-        localStorage.setItem('tencentDocUrl', tencentDocUrl);
-    }
-    
-    // 设置查看链接
-    if (viewTableLink) {
-        viewTableLink.href = tencentDocUrl;
-        viewTableLink.style.display = 'inline-block';
-    }
+    // 检查是否是管理员（有GitHub Token的用户）
+    checkAdminStatus();
     
     // 表单提交处理
     if (rsvpForm) {
         rsvpForm.addEventListener('submit', handleRSVPSubmit);
+    }
+}
+
+// 检查管理员状态
+function checkAdminStatus() {
+    const githubToken = localStorage.getItem('githubToken');
+    const adminActions = document.getElementById('admin-actions');
+    
+    // 如果有GitHub Token，显示管理按钮
+    if (githubToken && adminActions) {
+        adminActions.style.display = 'flex';
+    } else if (adminActions) {
+        adminActions.style.display = 'none';
     }
 }
 
@@ -439,8 +436,7 @@ function handleRSVPSubmit(e) {
     // 重置表单
     rsvpForm.reset();
     
-    // 尝试同步到腾讯文档
-    syncToTencentDoc(guestData);
+    // 数据已保存，如果设置了GitHub Token会自动同步到GitHub
 }
 
 // 显示弹幕
@@ -638,9 +634,13 @@ function setGitHubToken() {
     if (token && token.trim()) {
         localStorage.setItem('githubToken', token.trim());
         alert('GitHub Token已设置！数据将自动保存到GitHub。');
+        // 显示管理按钮
+        checkAdminStatus();
     } else if (token === '') {
         localStorage.removeItem('githubToken');
         alert('GitHub Token已清除，数据将只保存到本地。');
+        // 隐藏管理按钮
+        checkAdminStatus();
     }
 }
 
@@ -679,32 +679,7 @@ function exportToCSV() {
     link.click();
 }
 
-// 同步到腾讯文档（保留功能，但主要使用数据查看页面）
-async function syncToTencentDoc(guestData) {
-    // 数据已自动保存到本地存储
-    // 用户可以通过 data-viewer.html 页面查看和管理所有数据
-    
-    // 可选：尝试使用腾讯文档的Webhook（如果配置了）
-    const webhookUrl = localStorage.getItem('tencentDocWebhook');
-    if (webhookUrl) {
-        try {
-            await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(guestData)
-            });
-            console.log('数据已同步到腾讯文档');
-            return;
-        } catch (err) {
-            console.log('Webhook同步失败', err);
-        }
-    }
-    
-    // 数据已保存，可以通过 data-viewer.html 查看
-    console.log('数据已保存，可通过数据查看页面查看');
-}
+// 数据已自动保存到本地存储和GitHub（如果设置了Token）
 
 // 待同步队列
 let syncQueue = [];
@@ -737,117 +712,6 @@ function loadSyncQueue() {
     }
 }
 
-// 手动同步所有数据到腾讯文档（通过复制功能）
-function manualSyncToTencentDoc() {
-    const guests = loadGuestData();
-    if (guests.length === 0) {
-        alert('暂无数据需要同步');
-        return;
-    }
-    
-    // 生成表格格式的数据（使用Tab分隔，方便粘贴到腾讯文档）
-    const tableData = guests.map(guest => {
-        return [
-            guest.name || '',
-            guest.phone || '',
-            guest.count || '',
-            guest.blessing || '',
-            new Date(guest.timestamp).toLocaleString('zh-CN')
-        ].join('\t');
-    }).join('\n');
-    
-    // 复制到剪贴板（使用现代API）
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(tableData).then(() => {
-            // 打开腾讯文档
-            window.open(tencentDocUrl, '_blank');
-            
-            // 显示提示
-            showSyncInstructions();
-        }).catch(err => {
-            // 降级方案：使用传统方法
-            fallbackCopyToClipboard(tableData);
-        });
-    } else {
-        // 降级方案
-        fallbackCopyToClipboard(tableData);
-    }
-}
-
-// 降级复制方法
-function fallbackCopyToClipboard(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        window.open(tencentDocUrl, '_blank');
-        showSyncInstructions();
-    } catch (err) {
-        alert('复制失败，请手动复制数据');
-        console.error('复制失败:', err);
-    }
-    document.body.removeChild(textarea);
-}
-
-// 显示同步说明
-function showSyncInstructions() {
-    const message = document.createElement('div');
-    message.className = 'success-message';
-    message.style.maxWidth = '500px';
-    message.innerHTML = `
-        <div class="success-icon">📋</div>
-        <div class="success-text" style="text-align: left; margin: 1rem 0;">
-            <strong>数据已复制到剪贴板！</strong><br><br>
-            <strong>操作步骤：</strong><br>
-            1. 在腾讯文档表格中，选中要粘贴的起始单元格（建议从第2行开始，第1行是表头）<br>
-            2. 按 <strong>Ctrl+V</strong> (Windows) 或 <strong>Cmd+V</strong> (Mac) 粘贴数据<br>
-            3. 数据会自动填充到表格中<br><br>
-            <strong>数据格式：</strong><br>
-            姓名 | 电话 | 参加人数 | 祝福语 | 提交时间
-        </div>
-        <button class="close-btn" onclick="this.parentElement.remove()">我知道了</button>
-    `;
-    document.body.appendChild(message);
-    
-    // 10秒后自动关闭
-    setTimeout(() => {
-        if (message.parentNode) {
-            message.remove();
-        }
-    }, 10000);
-}
-
-// 设置腾讯文档链接
-function setTencentDocUrl() {
-    const currentUrl = tencentDocUrl || '';
-    const url = prompt('请输入您的腾讯文档表格链接：', currentUrl);
-    if (url && url.trim()) {
-        tencentDocUrl = url.trim();
-        localStorage.setItem('tencentDocUrl', tencentDocUrl);
-        if (viewTableLink) {
-            viewTableLink.href = tencentDocUrl;
-            viewTableLink.style.display = 'inline-block';
-        }
-        alert('腾讯文档链接已设置！');
-    }
-}
-
-// 设置腾讯文档Webhook（如果使用第三方服务）
-function setTencentDocWebhook() {
-    const currentWebhook = localStorage.getItem('tencentDocWebhook') || '';
-    const webhook = prompt('请输入腾讯文档Webhook URL（可选，用于自动同步）：', currentWebhook);
-    if (webhook && webhook.trim()) {
-        localStorage.setItem('tencentDocWebhook', webhook.trim());
-        alert('Webhook已设置！');
-    } else if (webhook === '') {
-        localStorage.removeItem('tencentDocWebhook');
-        alert('Webhook已清除！');
-    }
-}
 
 // 在页面加载时显示已有的祝福语弹幕
 window.addEventListener('load', () => {
@@ -869,8 +733,5 @@ loadSyncQueue();
 
 // 添加导出功能到页面（可选，可以通过控制台调用）
 window.exportGuestData = exportToCSV;
-window.setTencentDocUrl = setTencentDocUrl;
-window.setTencentDocWebhook = setTencentDocWebhook;
-window.manualSyncToTencentDoc = manualSyncToTencentDoc;
 window.setGitHubToken = setGitHubToken;
 
