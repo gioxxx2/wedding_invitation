@@ -485,23 +485,45 @@ function handleRSVPSubmit(e) {
         timestamp: new Date().toISOString()
     };
     
-    // 保存来宾信息（异步，但不阻塞）
-    saveGuestData(guestData).catch(err => {
-        console.error('保存数据出错:', err);
-    });
+    // 先保存到本地（用于弹幕和本地查看）
+    saveGuestDataLocal(guestData);
     
     // 如果有祝福语，显示弹幕
     if (guestData.blessing.trim()) {
         showDanmaku(guestData.blessing, guestData.name);
     }
     
-    // 显示成功提示
-    showSuccessMessage();
+    // 获取腾讯问卷链接（优先使用配置的，否则使用默认链接）
+    const surveyUrl = localStorage.getItem('tencentSurveyUrl') || 'https://wj.qq.com/s2/25294690/4365/';
+    
+    // 跳转到腾讯问卷
+    // 显示提示信息
+    showSuccessMessage('正在跳转到腾讯问卷...');
+    
+    // 延迟跳转，让用户看到提示
+    setTimeout(() => {
+        // 跳转到腾讯问卷（新窗口打开）
+        window.open(surveyUrl, '_blank');
+    }, 1500);
+    
+    // 同时尝试保存到GitHub（如果配置了token，作为备份）
+    const githubToken = localStorage.getItem('githubToken');
+    if (githubToken) {
+        saveGuestData(guestData).catch(err => {
+            console.error('保存数据到GitHub出错:', err);
+        });
+    }
     
     // 重置表单
     rsvpForm.reset();
-    
-    // 数据已保存，如果设置了GitHub Token会自动同步到GitHub
+}
+
+// 保存到本地存储（用于弹幕和本地查看）
+function saveGuestDataLocal(guestData) {
+    let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
+    guests.push(guestData);
+    localStorage.setItem('weddingGuests', JSON.stringify(guests));
+    console.log('✅ 数据已保存到本地存储，共', guests.length, '条记录');
 }
 
 // 显示弹幕
@@ -545,23 +567,45 @@ function showDanmaku(blessing, name) {
 }
 
 // 显示成功提示
-function showSuccessMessage() {
+function showSuccessMessage(customMessage) {
     const message = document.createElement('div');
     message.className = 'success-message';
+    const displayMessage = customMessage || '感谢您的确认！';
     message.innerHTML = `
         <div class="success-icon">✅</div>
-        <div class="success-text">感谢您的确认！</div>
+        <div class="success-text">${displayMessage}</div>
         <button class="close-btn" onclick="this.parentElement.remove()">确定</button>
     `;
     document.body.appendChild(message);
     
-    // 3秒后自动关闭
+    // 3秒后自动关闭（如果有自定义消息，2秒后关闭）
     setTimeout(() => {
         if (message.parentNode) {
             message.remove();
         }
-    }, 3000);
+    }, customMessage ? 2000 : 3000);
 }
+
+// 设置腾讯问卷链接
+function setTencentSurveyUrl() {
+    const currentUrl = localStorage.getItem('tencentSurveyUrl') || '';
+    const url = prompt('请输入腾讯问卷链接：\n\n例如：https://wj.qq.com/s2/1234567/ab3d/', currentUrl);
+    
+    if (url) {
+        // 验证URL格式
+        if (url.startsWith('https://wj.qq.com/') || url.startsWith('http://wj.qq.com/')) {
+            localStorage.setItem('tencentSurveyUrl', url);
+            alert('✅ 腾讯问卷链接已设置！\n\n提交表单后，将自动跳转到腾讯问卷。');
+            console.log('✅ 腾讯问卷链接已保存:', url);
+        } else {
+            alert('❌ 请输入有效的腾讯问卷链接（应以 https://wj.qq.com/ 开头）');
+        }
+    }
+}
+
+// 请求队列，避免并发冲突
+let saveQueue = [];
+let isSaving = false;
 
 // 保存来宾信息到本地存储和GitHub
 async function saveGuestData(guestData) {
@@ -575,18 +619,70 @@ async function saveGuestData(guestData) {
     const githubToken = localStorage.getItem('githubToken');
     if (githubToken) {
         console.log('🔑 检测到GitHub Token，开始同步到GitHub...');
-        if (isWeChatBrowser()) {
-            console.log('📱 微信浏览器环境，使用异步保存（不阻塞）');
-            // 微信浏览器中异步保存，不阻塞用户操作
-            saveToGitHub(guests).catch(err => {
-                console.error('微信浏览器中保存到GitHub失败:', err);
-                // 在微信中，即使失败也不显示错误，避免影响用户体验
-            });
-        } else {
-            await saveToGitHub(guests);
+        // 将保存任务加入队列
+        saveQueue.push(guests);
+        // 如果当前没有正在保存的任务，开始处理队列
+        if (!isSaving) {
+            processSaveQueue();
         }
     } else {
         console.warn('⚠️ 未设置GitHub Token，数据只保存到本地。点击"🔑 设置GitHub保存"按钮可启用GitHub同步。');
+    }
+}
+
+// 处理保存队列
+async function processSaveQueue() {
+    if (saveQueue.length === 0) {
+        isSaving = false;
+        return;
+    }
+    
+    isSaving = true;
+    const guests = saveQueue[saveQueue.length - 1]; // 取最新的数据
+    saveQueue = []; // 清空队列，只保留最新的
+    
+    try {
+        if (isWeChatBrowser()) {
+            console.log('📱 微信浏览器环境，使用异步保存（不阻塞）');
+            // 微信浏览器中异步保存，不阻塞用户操作
+            await saveToGitHubWithRetry(guests);
+        } else {
+            await saveToGitHubWithRetry(guests);
+        }
+    } catch (err) {
+        console.error('保存到GitHub失败:', err);
+        // 在微信中，即使失败也不显示错误，避免影响用户体验
+        if (!isWeChatBrowser()) {
+            showGitHubSaveError('保存失败', err.message);
+        }
+    } finally {
+        // 继续处理队列中的下一个任务
+        setTimeout(() => {
+            processSaveQueue();
+        }, 1000); // 延迟1秒，避免请求过于频繁
+    }
+}
+
+// 带重试机制的保存函数
+async function saveToGitHubWithRetry(guests, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`📤 尝试保存到GitHub (第 ${attempt}/${maxRetries} 次)...`);
+            await saveToGitHub(guests);
+            console.log('✅ 保存成功！');
+            return; // 成功则退出
+        } catch (error) {
+            console.error(`❌ 第 ${attempt} 次尝试失败:`, error.message);
+            if (attempt < maxRetries) {
+                // 等待后重试，等待时间递增（1秒、2秒、3秒）
+                const waitTime = attempt * 1000;
+                console.log(`⏳ ${waitTime/1000}秒后重试...`);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            } else {
+                // 所有重试都失败，抛出错误
+                throw new Error(`保存失败：已重试 ${maxRetries} 次，最后错误：${error.message}`);
+            }
+        }
     }
 }
 
@@ -599,82 +695,78 @@ async function saveToGitHub(guests) {
         return;
     }
     
+    const repo = 'gioxxx2/wedding_invitation';
+    const filePath = 'data/guests.json';
+    const content = JSON.stringify(guests, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(content)));
+    
+    console.log('📤 准备保存', guests.length, '条记录到GitHub...');
+    
+    // 先获取文件SHA（如果存在）
+    let sha = null;
     try {
-        const repo = 'gioxxx2/wedding_invitation';
-        const filePath = 'data/guests.json';
-        const content = JSON.stringify(guests, null, 2);
-        const encodedContent = btoa(unescape(encodeURIComponent(content)));
-        
-        console.log('📤 准备保存', guests.length, '条记录到GitHub...');
-        
-        // 先获取文件SHA（如果存在）
-        let sha = null;
-        try {
-            const getResponse = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+        const getResponse = await fetchWithTimeout(
+            `https://api.github.com/repos/${repo}/contents/${filePath}`,
+            {
                 headers: {
                     'Authorization': `Bearer ${githubToken}`,
                     'Accept': 'application/vnd.github.v3+json'
                 }
-            });
-            if (getResponse.ok) {
-                const fileData = await getResponse.json();
-                sha = fileData.sha;
-                console.log('📋 获取到现有文件的SHA:', sha.substring(0, 10) + '...');
-            } else if (getResponse.status === 404) {
-                // 文件不存在，继续创建新文件
-                console.log('📄 文件不存在，将创建新文件');
-            } else {
-                const errorText = await getResponse.text();
-                console.error('❌ 获取文件失败:', getResponse.status, errorText);
-                showGitHubSaveError(getResponse.status, `获取文件失败: ${errorText}`);
-                return;
-            }
-        } catch (e) {
-            console.error('❌ 获取文件出错:', e);
-            showGitHubSaveError('网络错误', `获取文件出错: ${e.message}`);
-            return;
-        }
-        
-        // 创建或更新文件
-        console.log('💾 正在上传到GitHub...');
-        
-        // 微信浏览器特殊处理：添加超时和重试机制
-        const fetchOptions = {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${githubToken}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                message: `更新来宾信息 - ${new Date().toLocaleString('zh-CN')}`,
-                content: encodedContent,
-                sha: sha
-            })
-        };
+            15000 // 15秒超时
+        );
         
-        // 如果是微信浏览器，添加超时控制
-        if (isWeChatBrowser()) {
-            console.log('📱 检测到微信浏览器，使用特殊处理');
-            // 使用Promise.race实现超时
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('请求超时')), 30000); // 30秒超时
-            });
-            
-            const fetchPromise = fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, fetchOptions);
-            var response = await Promise.race([fetchPromise, timeoutPromise]);
+        if (getResponse.ok) {
+            const fileData = await getResponse.json();
+            sha = fileData.sha;
+            console.log('📋 获取到现有文件的SHA:', sha.substring(0, 10) + '...');
+        } else if (getResponse.status === 404) {
+            // 文件不存在，继续创建新文件
+            console.log('📄 文件不存在，将创建新文件');
         } else {
-            var response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, fetchOptions);
+            const errorText = await getResponse.text();
+            throw new Error(`获取文件失败 (${getResponse.status}): ${errorText}`);
         }
+    } catch (e) {
+        if (e.name === 'TimeoutError') {
+            throw new Error('获取文件超时，请检查网络连接');
+        }
+        throw new Error(`获取文件出错: ${e.message}`);
+    }
+    
+    // 创建或更新文件
+    console.log('💾 正在上传到GitHub...');
+    
+    const fetchOptions = {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${githubToken}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: `更新来宾信息 - ${new Date().toLocaleString('zh-CN')}`,
+            content: encodedContent,
+            sha: sha
+        })
+    };
+    
+    try {
+        const response = await fetchWithTimeout(
+            `https://api.github.com/repos/${repo}/contents/${filePath}`,
+            fetchOptions,
+            20000 // 20秒超时
+        );
         
         if (response.ok) {
             const result = await response.json();
             console.log('✅ 数据已保存到GitHub:', result.commit.html_url);
             // 显示成功提示
-            showGitHubSaveSuccess();
+            if (!isWeChatBrowser()) {
+                showGitHubSaveSuccess();
+            }
         } else {
             const errorText = await response.text();
-            console.error('❌ 保存到GitHub失败:', response.status, errorText);
             let errorMessage = errorText;
             try {
                 const errorJson = JSON.parse(errorText);
@@ -682,13 +774,28 @@ async function saveToGitHub(guests) {
             } catch (e) {
                 // 如果不是JSON，直接使用原文本
             }
-            // 显示错误提示
-            showGitHubSaveError(response.status, errorMessage);
+            throw new Error(`保存失败 (${response.status}): ${errorMessage}`);
         }
     } catch (error) {
-        console.error('❌ 保存到GitHub出错:', error);
-        showGitHubSaveError('网络错误', error.message);
+        if (error.name === 'TimeoutError') {
+            throw new Error('上传超时，请检查网络连接');
+        }
+        throw error;
     }
+}
+
+// 带超时的 fetch 函数
+function fetchWithTimeout(url, options, timeout = 30000) {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => {
+            setTimeout(() => {
+                const timeoutError = new Error('请求超时');
+                timeoutError.name = 'TimeoutError';
+                reject(timeoutError);
+            }, timeout);
+        })
+    ]);
 }
 
 // 显示GitHub保存成功提示
