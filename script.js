@@ -238,128 +238,6 @@ function loadVideo() {
     videoContainer.appendChild(videoItem);
 }
 
-// 地图功能 - 使用高德地图API
-function loadAddress() {
-    // 等待高德地图API加载完成
-    if (typeof AMap === 'undefined') {
-        setTimeout(loadAddress, 100);
-        return;
-    }
-    
-    // 跳转到高德地图app的函数
-    function openAmapApp(lng, lat, name, address) {
-        // 检测设备类型
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        const isAndroid = /Android/.test(navigator.userAgent);
-        
-        let appUrl = '';
-        if (isIOS) {
-            // iOS高德地图URI Scheme
-            appUrl = `iosamap://navi?sourceApplication=wedding&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0`;
-        } else if (isAndroid) {
-            // Android高德地图URI Scheme
-            appUrl = `androidamap://navi?sourceApplication=wedding&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0`;
-        } else {
-            // PC端使用网页版高德地图
-            appUrl = `https://uri.amap.com/search?query=${encodeURIComponent(address)}`;
-        }
-        
-        // 尝试打开app，如果失败则打开网页版
-        const link = document.createElement('a');
-        link.href = appUrl;
-        link.target = '_blank';
-        link.click();
-        
-        // 如果app没有安装，3秒后打开网页版
-        setTimeout(() => {
-            if (isIOS || isAndroid) {
-                window.open(`https://uri.amap.com/search?query=${encodeURIComponent(address)}`, '_blank');
-            }
-        }, 3000);
-    }
-    
-    // 初始化出阁之喜地点地图（深圳）
-    const chugeMapContainer = document.getElementById('map-container-chuge');
-    if (chugeMapContainer) {
-        const chugeLng = 113.946533;
-        const chugeLat = 22.540503;
-        const chugeName = '圣丰城酒家（南山科技园店）';
-        const chugeAddress = '广东省深圳市南山区讯美科技广场圣丰城酒家（南山科技园店）';
-        
-        const chugeMap = new AMap.Map('map-container-chuge', {
-            zoom: 16,
-            center: [chugeLng, chugeLat], // 深圳圣丰城酒家坐标
-            viewMode: '3D',
-            // 启用所有交互
-            dragEnable: true,            // 启用拖拽
-            scrollWheelZoom: true,       // 启用滚轮缩放
-            doubleClickZoom: true,       // 启用双击缩放
-            keyboardEnable: true,        // 启用键盘操作
-            zoomEnable: true,             // 启用缩放控件
-            rotateEnable: true,          // 启用旋转
-            pitchEnable: true,            // 启用俯仰
-            mapStyle: 'amap://styles/normal' // 使用标准样式
-        });
-        
-        // 添加标记
-        const chugeMarker = new AMap.Marker({
-            position: [chugeLng, chugeLat],
-            title: chugeName
-        });
-        chugeMap.add(chugeMarker);
-        
-        // 添加信息窗体
-        const chugeInfoWindow = new AMap.InfoWindow({
-            content: `<div style="padding: 10px;"><h3>${chugeName}</h3><p>${chugeAddress}</p><p style="margin-top: 10px; color: #1890ff; cursor: pointer;" onclick="window.open('https://uri.amap.com/search?query=${encodeURIComponent(chugeAddress)}', '_blank')">点击查看地图</p></div>`
-        });
-        
-        // 标记点击事件
-        chugeMarker.on('click', () => {
-            chugeInfoWindow.open(chugeMap, chugeMarker.getPosition());
-        });
-    }
-    
-    // 初始化婚典之约地点地图（海口）
-    const hunyanMapContainer = document.getElementById('map-container-hunyan');
-    if (hunyanMapContainer) {
-        const hunyanLng = 110.330802;
-        const hunyanLat = 20.022071;
-        const hunyanName = '宝华海景大酒店（龙华店）';
-        const hunyanAddress = '海南省海口市龙华区滨海大道宝华海景大酒店（龙华店）';
-        
-        const hunyanMap = new AMap.Map('map-container-hunyan', {
-            zoom: 16,
-            center: [hunyanLng, hunyanLat], // 海口宝华海景大酒店坐标
-            viewMode: '3D',
-            // 启用所有交互
-            dragEnable: true,            // 启用拖拽
-            scrollWheelZoom: true,       // 启用滚轮缩放
-            doubleClickZoom: true,       // 启用双击缩放
-            keyboardEnable: true,        // 启用键盘操作
-            zoomEnable: true,             // 启用缩放控件
-            rotateEnable: true,          // 启用旋转
-            pitchEnable: true,            // 启用俯仰
-            mapStyle: 'amap://styles/normal' // 使用标准样式
-        });
-        
-        // 添加标记
-        const hunyanMarker = new AMap.Marker({
-            position: [hunyanLng, hunyanLat],
-            title: hunyanName
-        });
-        hunyanMap.add(hunyanMarker);
-        
-        // 添加信息窗体
-        const hunyanInfoWindow = new AMap.InfoWindow({
-            content: `<div style="padding: 10px;"><h3>${hunyanName}</h3><p>${hunyanAddress}</p><p style="margin-top: 10px; color: #1890ff; cursor: pointer;" onclick="window.open('https://uri.amap.com/search?query=${encodeURIComponent(hunyanAddress)}', '_blank')">点击查看地图</p></div>`
-        });
-        
-        // 标记点击事件
-        hunyanMarker.on('click', () => {
-            hunyanInfoWindow.open(hunyanMap, hunyanMarker.getPosition());
-        });
-    }
-}
 
 // 微信浏览器检测和兼容性处理
 function isWeChatBrowser() {
@@ -397,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 从GitHub仓库加载图片和视频
     loadPhotos();
     loadVideo();
-    loadAddress();
     
     // 添加平滑滚动效果
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

@@ -653,6 +653,8 @@ body {
 }
 
 /* 地址部分样式 */
+
+/* 婚礼地点部分 */
 .location {
     background: linear-gradient(135deg, #fff8f0 0%, #fef5e7 50%, #ffe8d6 100%);
     background-size: 200% 200%;
@@ -664,27 +666,6 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
     align-items: start;
-    margin-bottom: 3rem;
-}
-
-.maps-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    margin-top: 3rem;
-}
-
-.map-wrapper {
-    display: flex;
-    flex-direction: column;
-}
-
-.map-title {
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-    text-align: center;
-    font-weight: 500;
 }
 
 .address-card {
@@ -712,36 +693,6 @@ body {
     margin-bottom: 1rem;
     color: var(--light-text);
     line-height: 1.8;
-}
-
-.map-link {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding: 12px 30px;
-    background: var(--primary-color);
-    color: var(--white);
-    text-decoration: none;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-}
-
-.map-link:hover {
-    background: var(--accent-color);
-    transform: translateY(-2px);
-}
-
-.map-container {
-    width: 100%;
-    height: 400px;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px var(--shadow);
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.map-container:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* 爱情故事部分 */
@@ -1426,23 +1377,28 @@ body {
         gap: 2rem;
     }
 
-    .maps-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-
-    .map-container {
-        height: 300px;
-    }
-    
-    .map-container::after {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        bottom: 8px;
-    }
-
     .address-card {
         padding: 2rem 1.5rem;
+    }
+
+    .address-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .venue-name {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .address, .time {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.6;
+    }
+
+    .location {
+        padding: 60px 15px;
     }
 
     .nav-menu {
@@ -1616,15 +1572,6 @@ body {
     }
 
     /* 地址部分移动端优化 */
-    .location {
-        padding: 60px 15px;
-    }
-
-    .address-card h3 {
-        font-size: 1.5rem;
-        margin-bottom: 1.2rem;
-    }
-
     .venue-name {
         font-size: 1.2rem;
         margin-bottom: 0.8rem;
@@ -1642,10 +1589,6 @@ body {
         margin-top: 1.2rem;
     }
 
-    .map-title {
-        font-size: 1.1rem;
-        margin-bottom: 0.8rem;
-    }
 
     /* RSVP部分移动端优化 */
     .rsvp {
