@@ -43,14 +43,17 @@ window.addEventListener('scroll', () => {
 // 照片展示功能 - 从七牛云CDN加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// 七牛云CDN配置
-const QINIU_CDN_BASE = 'https://t7lml0iwa.hn-bkt.clouddn.com';
+// GitHub仓库 + jsDelivr CDN配置（支持HTTPS）
+const GITHUB_USER = 'gioxxx2';
+const GITHUB_REPO = 'wedding';
+const GITHUB_BRANCH = 'main';
+const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
 
-// 按顺序展示的图片（使用七牛云CDN）
+// 按顺序展示的图片（使用jsDelivr CDN）
 const selectedPhotos = [
-    `${QINIU_CDN_BASE}/1.jpg`,
-    `${QINIU_CDN_BASE}/2.jpg`,
-    `${QINIU_CDN_BASE}/3.jpg`
+    `${CDN_BASE}/picture/1.jpg`,
+    `${CDN_BASE}/picture/2.jpg`,
+    `${CDN_BASE}/picture/3.jpg`
 ];
 
 // 从七牛云CDN加载照片
@@ -167,11 +170,13 @@ function showPhotoModal(photoSrc) {
 // 视频展示功能 - 从七牛云CDN加载
 const videoContainer = document.getElementById('video-container');
 
-// 从七牛云CDN加载视频
+// 从GitHub仓库加载视频（使用jsDelivr CDN）
 function loadVideo() {
     if (!videoContainer) return;
     
-    const videoUrl = `${QINIU_CDN_BASE}/%E5%BE%90%E6%99%BA%E8%AF%B7%E6%9F%AC%E6%97%A0%E6%B0%B4%E5%8D%B0%EF%BC%882%EF%BC%89.mp4`; // 七牛云CDN地址
+    // 视频文件名需要URL编码
+    const videoFileName = encodeURIComponent('徐智请柬无水印（2）.mp4');
+    const videoUrl = `${CDN_BASE}/video/${videoFileName}`; // jsDelivr CDN地址
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
