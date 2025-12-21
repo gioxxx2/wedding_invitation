@@ -116,7 +116,7 @@
         </div>
     </section>
 
-    <!-- 婚礼地址部分 -->
+    <!-- 婚礼地点部分 -->
     <section id="location" class="section location">
         <div class="container">
             <h2 class="section-title">婚礼地点</h2>
@@ -132,16 +132,6 @@
                     <p class="venue-name">宝华海景大酒店（龙华店）</p>
                     <p class="address">详细地址：海南省海口市龙华区滨海大道宝华海景大酒店（龙华店）</p>
                     <p class="time">时间：2025年1月17日</p>
-                </div>
-            </div>
-            <div class="maps-container">
-                <div class="map-wrapper" data-location="chuge">
-                    <h4 class="map-title">出阁之喜地点</h4>
-                    <div id="map-container-chuge" class="map-container"></div>
-                </div>
-                <div class="map-wrapper" data-location="hunyan">
-                    <h4 class="map-title">婚典之约地点</h4>
-                    <div id="map-container-hunyan" class="map-container"></div>
                 </div>
             </div>
         </div>
@@ -193,9 +183,12 @@
                     </button>
                 </form>
                 <div class="rsvp-info">
-                    <p class="info-text">您的信息将被保存到在线表格中</p>
+                    <p class="info-text">您的信息将被保存到腾讯问卷中</p>
                     <div class="rsvp-actions" id="admin-actions" style="display: none;">
-                        <a href="data-viewer.html" class="table-link" target="_blank">
+                        <button onclick="setTencentSurveyUrl()" class="table-link" style="margin-left: 10px; border: none; cursor: pointer;">
+                            <span>⚙️ 设置腾讯问卷链接</span>
+                        </button>
+                        <a href="data-viewer.html" class="table-link" target="_blank" style="margin-left: 10px;">
                             <span>📊 查看来宾信息</span>
                         </a>
                         <button onclick="setGitHubToken()" class="table-link" style="margin-left: 10px; border: none; cursor: pointer;">
@@ -237,7 +230,6 @@
         </a>
     </nav>
 
-    <script src="https://webapi.amap.com/maps?v=2.0&key=8eec3224f8494e7e1457cd22f2430cba"></script>
     <script src="script.js"></script>
 </body>
 </html>
