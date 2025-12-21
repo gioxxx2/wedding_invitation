@@ -43,32 +43,34 @@ window.addEventListener('scroll', () => {
 // 照片展示功能 - 从七牛云CDN加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// GitHub仓库 + jsDelivr CDN配置（支持HTTPS）
-const GITHUB_USER = 'gioxxx2';
-const GITHUB_REPO = 'wedding_invitation';
-const GITHUB_BRANCH = 'main';
-const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
-// 备用方案：直接使用GitHub raw链接
-const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
+// Gitee仓库配置（支持HTTPS）
+const GITEE_USER = 'gioxxx2';
+const GITEE_REPO = 'wedding_invitation';
+const GITEE_BRANCH = 'main';
+// Gitee Pages CDN地址（如果启用了Pages）
+const GITEE_PAGES_BASE = `https://${GITEE_USER}.gitee.io/${GITEE_REPO}`;
+// Gitee raw链接（直接访问仓库文件）
+const GITEE_RAW_BASE = `https://gitee.com/${GITEE_USER}/${GITEE_REPO}/raw/${GITEE_BRANCH}`;
 
-// 获取资源URL（优先使用CDN，失败时使用raw）
+// 获取资源URL（优先使用Gitee Pages，失败时使用raw）
 function getResourceUrl(path) {
-    return `${CDN_BASE}/${path}`;
+    // 优先使用Gitee Pages（如果已启用）
+    return `${GITEE_PAGES_BASE}/${path}`;
 }
 
-// 获取备用资源URL
+// 获取备用资源URL（Gitee raw链接）
 function getFallbackResourceUrl(path) {
-    return `${RAW_BASE}/${path}`;
+    return `${GITEE_RAW_BASE}/${path}`;
 }
 
-// 按顺序展示的图片（使用jsDelivr CDN）
+// 按顺序展示的图片（使用Gitee资源）
 const selectedPhotos = [
     getResourceUrl('picture/1.jpg'),
     getResourceUrl('picture/2.jpg'),
     getResourceUrl('picture/3.jpg')
 ];
 
-// 从七牛云CDN加载照片
+// 从Gitee仓库加载照片
 function loadPhotos() {
     if (!photoGallery) return;
     
@@ -115,10 +117,10 @@ function addPhotoToGallery(photoSrc) {
     // 图片加载错误处理
     img.onerror = function() {
         console.error('图片加载失败:', photoSrc);
-        // 尝试使用备用方案：直接使用GitHub raw链接
+        // 尝试使用备用方案：直接使用Gitee raw链接
         const path = photoSrc.split('/').slice(-2).join('/'); // 获取 picture/1.jpg 这样的路径
         const fallbackUrl = getFallbackResourceUrl(path);
-        console.log('尝试备用URL:', fallbackUrl);
+        console.log('尝试备用URL (Gitee raw):', fallbackUrl);
         // 移除crossOrigin属性，因为raw.githubusercontent.com可能不支持CORS
         img.removeAttribute('crossOrigin');
         img.src = fallbackUrl;
@@ -191,16 +193,16 @@ function showPhotoModal(photoSrc) {
 
 // 照片从GitHub仓库加载，不需要上传功能
 
-// 视频展示功能 - 从七牛云CDN加载
+// 视频展示功能
 const videoContainer = document.getElementById('video-container');
 
-// 从GitHub仓库加载视频（使用jsDelivr CDN）
+// 从Gitee仓库加载视频
 function loadVideo() {
     if (!videoContainer) return;
     
     // 视频文件名需要URL编码
     const videoFileName = encodeURIComponent('徐智请柬无水印（2）.mp4');
-    const videoUrl = getResourceUrl(`video/${videoFileName}`); // jsDelivr CDN地址
+    const videoUrl = getResourceUrl(`video/${videoFileName}`); // Gitee资源地址
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
@@ -215,9 +217,9 @@ function loadVideo() {
     // 视频加载错误处理
     video.onerror = function() {
         console.error('视频加载失败:', videoUrl);
-        // 尝试使用备用方案：直接使用GitHub raw链接
+        // 尝试使用备用方案：直接使用Gitee raw链接
         const fallbackUrl = getFallbackResourceUrl(`video/${videoFileName}`);
-        console.log('尝试备用URL:', fallbackUrl);
+        console.log('尝试备用URL (Gitee raw):', fallbackUrl);
         // 移除crossOrigin属性
         video.removeAttribute('crossOrigin');
         video.src = fallbackUrl;
@@ -405,14 +407,14 @@ function setIntroBackground() {
     const cdnUrl = getResourceUrl('picture/4.jpg');
     const rawUrl = getFallbackResourceUrl('picture/4.jpg');
     
-    // 先尝试CDN
+    // 先尝试Gitee Pages
     const testImg = new Image();
     testImg.onload = function() {
         introBg.style.backgroundImage = `url('${cdnUrl}')`;
     };
     testImg.onerror = function() {
-        // CDN失败，使用raw链接
-        console.log('CDN背景图片加载失败，使用备用URL:', rawUrl);
+        // Gitee Pages失败，使用raw链接
+        console.log('Gitee Pages背景图片加载失败，使用备用URL (Gitee raw):', rawUrl);
         introBg.style.backgroundImage = `url('${rawUrl}')`;
     };
     testImg.src = cdnUrl;
