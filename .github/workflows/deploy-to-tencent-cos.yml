@@ -1,0 +1,94 @@
+name: Deploy to Tencent Cloud COS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install COS CLI
+        run: |
+          # 下载COS CLI
+          wget https://github.com/tencentyun/coscli/releases/download/v0.13.0-beta/coscli-linux -O coscli
+          chmod +x coscli
+          sudo mv coscli /usr/local/bin/
+
+      - name: Configure COS CLI
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+        run: |
+          # 配置COS CLI
+          coscli config init \
+            --secret-id "$SECRET_ID" \
+            --secret-key "$SECRET_KEY" \
+            --region ap-guangzhou \
+            --bucket wedding-1303923554 \
+            --ofs cos \
+            --confirm
+        continue-on-error: true
+
+      - name: Sync files to COS
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+        run: |
+          # 设置环境变量
+          export COS_SECRET_ID="$SECRET_ID"
+          export COS_SECRET_KEY="$SECRET_KEY"
+          
+          # 同步HTML文件
+          coscli cp index.html cos://wedding-1303923554/index.html \
+            --meta Content-Type:text/html;charset=utf-8 \
+            --region ap-guangzhou
+          
+          coscli cp data-viewer.html cos://wedding-1303923554/data-viewer.html \
+            --meta Content-Type:text/html;charset=utf-8 \
+            --region ap-guangzhou
+          
+          # 同步CSS文件
+          coscli cp styles.css cos://wedding-1303923554/styles.css \
+            --meta Content-Type:text/css;charset=utf-8 \
+            --region ap-guangzhou
+          
+          # 同步JS文件
+          coscli cp script.js cos://wedding-1303923554/script.js \
+            --meta Content-Type:application/javascript;charset=utf-8 \
+            --region ap-guangzhou
+          
+          # 同步图片文件夹
+          if [ -d "picture" ]; then
+            coscli sync picture/ cos://wedding-1303923554/picture/ \
+              --region ap-guangzhou \
+              --include "*.jpg,*.jpeg,*.png,*.gif"
+          fi
+          
+          # 同步视频文件夹
+          if [ -d "video" ]; then
+            coscli sync video/ cos://wedding-1303923554/video/ \
+              --region ap-guangzhou \
+              --include "*.mp4,*.mov,*.avi"
+          fi
+          
+          # 同步data文件夹（如果存在）
+          if [ -d "data" ]; then
+            coscli sync data/ cos://wedding-1303923554/data/ \
+              --region ap-guangzhou \
+              --include "*.json"
+          fi
+          
+          echo "✅ 部署完成！"
+          echo "访问地址: https://wedding-1303923554.cos-website.ap-guangzhou.myqcloud.com"
+
