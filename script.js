@@ -588,7 +588,8 @@ function showSuccessMessage(customMessage) {
 
 // 设置腾讯问卷链接
 function setTencentSurveyUrl() {
-    const currentUrl = localStorage.getItem('tencentSurveyUrl') || '';
+    const defaultUrl = 'https://wj.qq.com/s2/25294690/4365/';
+    const currentUrl = localStorage.getItem('tencentSurveyUrl') || defaultUrl;
     const url = prompt('请输入腾讯问卷链接：\n\n例如：https://wj.qq.com/s2/1234567/ab3d/', currentUrl);
     
     if (url) {
