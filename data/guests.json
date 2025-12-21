@@ -1,37 +1,10 @@
 [
   {
-    "name": "·",
-    "phone": "·",
+    "name": "ww",
+    "phone": "111",
     "count": "1",
+    "location": "深圳",
     "blessing": "",
-    "timestamp": "2025-12-20T14:43:23.368Z"
-  },
-  {
-    "name": "11",
-    "phone": "11",
-    "count": "2",
-    "blessing": "",
-    "timestamp": "2025-12-20T14:44:00.955Z"
-  },
-  {
-    "name": "111",
-    "phone": "1111",
-    "count": "2",
-    "blessing": "",
-    "timestamp": "2025-12-20T14:47:24.028Z"
-  },
-  {
-    "name": "1",
-    "phone": "11",
-    "count": "1",
-    "blessing": "",
-    "timestamp": "2025-12-20T14:50:40.699Z"
-  },
-  {
-    "name": "111",
-    "phone": "18520482460",
-    "count": "2",
-    "blessing": "",
-    "timestamp": "2025-12-20T14:53:54.649Z"
+    "timestamp": "2025-12-21T05:00:10.424Z"
   }
 ]
