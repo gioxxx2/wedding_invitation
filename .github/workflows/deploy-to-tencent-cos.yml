@@ -92,9 +92,7 @@ jobs:
               Region=region, 
               SecretId=secret_id, 
               SecretKey=secret_key,
-              Timeout=300,  # 增加超时时间到5分钟
-              ChunkSize=10 * 1024 * 1024,  # 10MB分片
-              MaxThread=5  # 多线程上传
+              Timeout=300  # 增加超时时间到5分钟
           )
           client = CosS3Client(config)
           
