@@ -423,61 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadVideo();
     loadAddress();
     
-    // 为"查看地图"链接添加跳转到高德地图app的功能
-    const mapLinks = document.querySelectorAll('.map-link');
-    mapLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const href = this.getAttribute('href');
-            const query = href.split('query=')[1];
-            if (query) {
-                const address = decodeURIComponent(query);
-                // 根据地址判断是哪个地点
-                let lng, lat, name;
-                if (address.includes('深圳') || address.includes('圣丰城')) {
-                    lng = 113.946533;
-                    lat = 22.540503;
-                    name = '圣丰城酒家（南山科技园店）';
-                } else if (address.includes('海口') || address.includes('宝华海景')) {
-                    lng = 110.330802;
-                    lat = 20.022071;
-                    name = '宝华海景大酒店（龙华店）';
-                } else {
-                    // 如果无法识别，直接打开网页版
-                    window.open(href, '_blank');
-                    return;
-                }
-                
-                // 检测设备类型
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                const isAndroid = /Android/.test(navigator.userAgent);
-                
-                let appUrl = '';
-                if (isIOS) {
-                    appUrl = `iosamap://navi?sourceApplication=wedding&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0`;
-                } else if (isAndroid) {
-                    appUrl = `androidamap://navi?sourceApplication=wedding&poiname=${encodeURIComponent(name)}&lat=${lat}&lon=${lng}&dev=0`;
-                } else {
-                    window.open(href, '_blank');
-                    return;
-                }
-                
-                // 尝试打开app
-                const link = document.createElement('a');
-                link.href = appUrl;
-                link.target = '_blank';
-                link.click();
-                
-                // 如果app没有安装，3秒后打开网页版
-                setTimeout(() => {
-                    window.open(href, '_blank');
-                }, 3000);
-            } else {
-                window.open(href, '_blank');
-            }
-        });
-    });
-    
     // 添加平滑滚动效果
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
