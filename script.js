@@ -43,12 +43,14 @@ window.addEventListener('scroll', () => {
 // 照片展示功能 - 从七牛云CDN加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// Gitee仓库配置（支持HTTPS）
-const GITEE_USER = 'gioxxx2';
-const GITEE_REPO = 'wedding_invitation';
-const GITEE_BRANCH = 'main';
-// Gitee raw链接（直接访问文件，使用raw而不是blob）
-const GITEE_RAW_BASE = `https://gitee.com/${GITEE_USER}/${GITEE_REPO}/raw/${GITEE_BRANCH}`;
+// GitHub仓库配置（支持HTTPS，避免CORS问题）
+const GITHUB_USER = 'gioxxx2';
+const GITHUB_REPO = 'wedding_invitation';
+const GITHUB_BRANCH = 'main';
+// GitHub Pages地址（与网站同源，避免CORS问题）
+const GITHUB_PAGES_BASE = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}`;
+// GitHub raw链接（备用方案）
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
 
 // 检测是否是本地环境
 function isLocalEnvironment() {
@@ -57,34 +59,34 @@ function isLocalEnvironment() {
            window.location.hostname === '127.0.0.1';
 }
 
-// 获取资源URL（本地环境使用相对路径，线上使用Gitee raw链接）
+// 获取资源URL（本地环境使用相对路径，线上使用GitHub Pages）
 function getResourceUrl(path) {
     if (isLocalEnvironment()) {
         // 本地环境使用相对路径
         return `./${path}`;
     }
-    // 线上环境使用Gitee raw链接
-    return `${GITEE_RAW_BASE}/${path}`;
+    // 线上环境使用GitHub Pages（与网站同源，避免CORS问题）
+    return `${GITHUB_PAGES_BASE}/${path}`;
 }
 
-// 获取备用资源URL（与主URL相同）
+// 获取备用资源URL（GitHub raw链接）
 function getFallbackResourceUrl(path) {
     if (isLocalEnvironment()) {
         // 本地环境使用相对路径
         return `./${path}`;
     }
-    // 备用方案也是Gitee raw链接
-    return `${GITEE_RAW_BASE}/${path}`;
+    // 备用方案使用GitHub raw链接
+    return `${GITHUB_RAW_BASE}/${path}`;
 }
 
-// 按顺序展示的图片（使用Gitee资源）
+// 按顺序展示的图片（使用GitHub资源）
 const selectedPhotos = [
     getResourceUrl('picture/1.jpg'),
     getResourceUrl('picture/2.jpg'),
     getResourceUrl('picture/3.jpg')
 ];
 
-// 从Gitee仓库加载照片
+// 从GitHub仓库加载照片
 function loadPhotos() {
     if (!photoGallery) return;
     
@@ -133,8 +135,8 @@ function addPhotoToGallery(photoSrc) {
         // 尝试使用备用方案：直接使用Gitee raw链接
         const path = photoSrc.split('/').slice(-2).join('/'); // 获取 picture/1.jpg 这样的路径
         const fallbackUrl = getFallbackResourceUrl(path);
-        console.log('尝试备用URL (Gitee raw):', fallbackUrl);
-        // Gitee raw链接不支持CORS，不使用crossOrigin属性
+        console.log('尝试备用URL (GitHub raw):', fallbackUrl);
+        // GitHub raw链接支持跨域，但为了兼容性不使用crossOrigin
         img.src = fallbackUrl;
         // 如果备用URL也失败，显示占位图
         img.onerror = function() {
@@ -208,13 +210,13 @@ function showPhotoModal(photoSrc) {
 // 视频展示功能
 const videoContainer = document.getElementById('video-container');
 
-// 从Gitee仓库加载视频
+// 从GitHub仓库加载视频
 function loadVideo() {
     if (!videoContainer) return;
     
     // 视频文件名需要URL编码
     const videoFileName = encodeURIComponent('徐智请柬无水印（2）.mp4');
-    const videoUrl = getResourceUrl(`video/${videoFileName}`); // Gitee资源地址
+    const videoUrl = getResourceUrl(`video/${videoFileName}`); // GitHub资源地址
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
@@ -231,8 +233,8 @@ function loadVideo() {
         console.error('视频加载失败:', videoUrl);
         // 尝试使用备用方案：直接使用Gitee raw链接
         const fallbackUrl = getFallbackResourceUrl(`video/${videoFileName}`);
-        console.log('尝试备用URL (Gitee raw):', fallbackUrl);
-        // Gitee raw链接不支持CORS，不使用crossOrigin属性
+        console.log('尝试备用URL (GitHub raw):', fallbackUrl);
+        // GitHub raw链接支持跨域，但为了兼容性不使用crossOrigin
         video.src = fallbackUrl;
         // 如果备用URL也失败，显示错误信息
         video.onerror = function() {
@@ -417,14 +419,14 @@ function setIntroBackground() {
     
     const bgUrl = getResourceUrl('picture/4.jpg');
     
-    // 直接设置背景图片（本地用相对路径，线上用Gitee raw链接）
+    // 直接设置背景图片（本地用相对路径，线上用GitHub Pages）
     introBg.style.backgroundImage = `url('${bgUrl}')`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     // 设置封面背景图片
     setIntroBackground();
-    // 从Gitee仓库加载图片和视频
+    // 从GitHub仓库加载图片和视频
     loadPhotos();
     loadVideo();
     loadAddress();
