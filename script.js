@@ -654,7 +654,16 @@ async function saveGuestData(guestData) {
     const githubToken = localStorage.getItem('githubToken');
     if (githubToken) {
         console.log('🔑 检测到GitHub Token，开始同步到GitHub...');
-        await saveToGitHub(guests);
+        if (isWeChatBrowser()) {
+            console.log('📱 微信浏览器环境，使用异步保存（不阻塞）');
+            // 微信浏览器中异步保存，不阻塞用户操作
+            saveToGitHub(guests).catch(err => {
+                console.error('微信浏览器中保存到GitHub失败:', err);
+                // 在微信中，即使失败也不显示错误，避免影响用户体验
+            });
+        } else {
+            await saveToGitHub(guests);
+        }
     } else {
         console.warn('⚠️ 未设置GitHub Token，数据只保存到本地。点击"🔑 设置GitHub保存"按钮可启用GitHub同步。');
     }
