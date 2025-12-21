@@ -13,87 +13,63 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Deploy to Tencent COS
+        uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          node-version: '18'
+          args: upload -rs ./ cos://wedding-1303923554/ --ignore '.*\.git.*'
+          secret_id: ${{ secrets.TENCENT_SECRET_ID }}
+          secret_key: ${{ secrets.TENCENT_SECRET_KEY }}
+          bucket: wedding-1303923554
+          region: ap-guangzhou
 
-      - name: Install COS CLI
-        run: |
-          # 下载COS CLI
-          wget https://github.com/tencentyun/coscli/releases/download/v0.13.0-beta/coscli-linux -O coscli
-          chmod +x coscli
-          sudo mv coscli /usr/local/bin/
-
-      - name: Configure COS CLI
+      - name: Set Content-Type for files
         env:
           SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
         run: |
-          # 创建配置目录
-          mkdir -p ~/.cos
-          # 创建配置文件（注意：.cos.yaml是文件，不是目录）
-          cat > ~/.cos.yaml << 'EOF'
-          base:
-            secretid: ${SECRET_ID}
-            secretkey: ${SECRET_KEY}
-            sessiontoken: ""
-            protocol: https
-            timeout: 60
-            retry: 3
-          buckets:
-            - name: wedding-1303923554
-              alias: wedding-1303923554
-              region: ap-guangzhou
+          # 安装Python和COS SDK
+          pip3 install cos-python-sdk-v5
+          
+          # 使用Python脚本设置Content-Type
+          python3 << 'EOF'
+          from qcloud_cos import CosConfig
+          from qcloud_cos import CosS3Client
+          import os
+          
+          secret_id = os.environ['SECRET_ID']
+          secret_key = os.environ['SECRET_KEY']
+          region = 'ap-guangzhou'
+          bucket = 'wedding-1303923554'
+          
+          config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+          client = CosS3Client(config)
+          
+          # 设置文件Content-Type的映射
+          content_types = {
+              'index.html': 'text/html; charset=utf-8',
+              'data-viewer.html': 'text/html; charset=utf-8',
+              'styles.css': 'text/css; charset=utf-8',
+              'script.js': 'application/javascript; charset=utf-8'
+          }
+          
+          for file, content_type in content_types.items():
+              try:
+                  # 获取文件元数据
+                  response = client.head_object(Bucket=bucket, Key=file)
+                  # 复制对象并替换元数据
+                  client.copy_object(
+                      Bucket=bucket,
+                      Key=file,
+                      CopySource={'Bucket': bucket, 'Key': file, 'Region': region},
+                      MetadataDirective='REPLACE',
+                      ContentType=content_type
+                  )
+                  print(f"✅ 已设置 {file} 的Content-Type为 {content_type}")
+              except Exception as e:
+                  print(f"⚠️ 设置 {file} 失败: {e}")
           EOF
-          # 替换环境变量
-          sed -i "s|\${SECRET_ID}|$SECRET_ID|g" ~/.cos.yaml
-          sed -i "s|\${SECRET_KEY}|$SECRET_KEY|g" ~/.cos.yaml
-          echo "✅ COS CLI配置完成"
-          # 验证配置文件（隐藏敏感信息）
-          sed 's/secretid:.*/secretid: ***/g; s/secretkey:.*/secretkey: ***/g' ~/.cos.yaml
 
-      - name: Sync files to COS
-        env:
-          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
-          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+      - name: Deploy Summary
         run: |
-          # 设置配置文件路径
-          export COS_CONFIG_PATH=~/.cos.yaml
-          
-          # 同步HTML文件
-          coscli cp index.html cos://wedding-1303923554/index.html \
-            --meta Content-Type:text/html;charset=utf-8
-          
-          coscli cp data-viewer.html cos://wedding-1303923554/data-viewer.html \
-            --meta Content-Type:text/html;charset=utf-8
-          
-          # 同步CSS文件
-          coscli cp styles.css cos://wedding-1303923554/styles.css \
-            --meta Content-Type:text/css;charset=utf-8
-          
-          # 同步JS文件
-          coscli cp script.js cos://wedding-1303923554/script.js \
-            --meta Content-Type:application/javascript;charset=utf-8
-          
-          # 同步图片文件夹
-          if [ -d "picture" ]; then
-            coscli sync picture/ cos://wedding-1303923554/picture/ \
-              --include "*.jpg,*.jpeg,*.png,*.gif"
-          fi
-          
-          # 同步视频文件夹
-          if [ -d "video" ]; then
-            coscli sync video/ cos://wedding-1303923554/video/ \
-              --include "*.mp4,*.mov,*.avi"
-          fi
-          
-          # 同步data文件夹（如果存在）
-          if [ -d "data" ]; then
-            coscli sync data/ cos://wedding-1303923554/data/ \
-              --include "*.json"
-          fi
-          
           echo "✅ 部署完成！"
           echo "访问地址: https://wedding-1303923554.cos-website.ap-guangzhou.myqcloud.com"
-
