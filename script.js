@@ -40,22 +40,24 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// 照片展示功能 - 从GitHub仓库加载
+// 照片展示功能 - 从七牛云CDN加载
 const photoGallery = document.getElementById('photo-gallery');
 
-// 按顺序展示的图片
+// 七牛云CDN配置
+const QINIU_CDN_BASE = 'http://t7lml0iwa.hn-bkt.clouddn.com';
+
+// 按顺序展示的图片（使用七牛云CDN）
 const selectedPhotos = [
-    'picture/1.jpg',
-    'picture/2.jpg',
-    'picture/3.jpg'
+    `${QINIU_CDN_BASE}/1.jpg`,
+    `${QINIU_CDN_BASE}/2.jpg`,
+    `${QINIU_CDN_BASE}/3.jpg`
 ];
 
-// 从GitHub仓库加载照片
+// 从七牛云CDN加载照片
 function loadPhotos() {
     if (!photoGallery) return;
     
-    selectedPhotos.forEach((photoPath, index) => {
-        const photoUrl = photoPath; // 相对路径，GitHub Pages会自动解析
+    selectedPhotos.forEach((photoUrl, index) => {
         addPhotoToGallery(photoUrl);
     });
 }
@@ -162,15 +164,14 @@ function showPhotoModal(photoSrc) {
 
 // 照片从GitHub仓库加载，不需要上传功能
 
-// 视频展示功能 - 从GitHub仓库加载
+// 视频展示功能 - 从七牛云CDN加载
 const videoContainer = document.getElementById('video-container');
 
-// 从GitHub仓库加载视频
+// 从七牛云CDN加载视频
 function loadVideo() {
     if (!videoContainer) return;
     
-    const videoPath = 'video/徐智请柬无水印（2）.mp4';
-    const videoUrl = videoPath; // 相对路径，GitHub Pages会自动解析
+    const videoUrl = `${QINIU_CDN_BASE}/%E5%BE%90%E6%99%BA%E8%AF%B7%E6%9F%AC%E6%97%A0%E6%B0%B4%E5%8D%B0%EF%BC%882%EF%BC%89.mp4`; // 七牛云CDN地址
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
