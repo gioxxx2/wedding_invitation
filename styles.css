@@ -737,34 +737,11 @@ body {
     overflow: hidden;
     box-shadow: 0 4px 15px var(--shadow);
     position: relative;
-    cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .map-container:hover {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-}
-
-.map-container::after {
-    content: '点击查看地图';
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    pointer-events: none;
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.map-container:hover::after {
-    opacity: 1;
 }
 
 /* 爱情故事部分 */

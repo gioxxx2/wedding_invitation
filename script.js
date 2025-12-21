@@ -290,14 +290,14 @@ function loadAddress() {
             zoom: 16,
             center: [chugeLng, chugeLat], // 深圳圣丰城酒家坐标
             viewMode: '3D',
-            // 禁用所有交互
-            dragEnable: false,           // 禁用拖拽
-            scrollWheelZoom: false,      // 禁用滚轮缩放
-            doubleClickZoom: false,       // 禁用双击缩放
-            keyboardEnable: false,        // 禁用键盘操作
-            zoomEnable: false,            // 禁用缩放控件
-            rotateEnable: false,          // 禁用旋转
-            pitchEnable: false,           // 禁用俯仰
+            // 启用所有交互
+            dragEnable: true,            // 启用拖拽
+            scrollWheelZoom: true,       // 启用滚轮缩放
+            doubleClickZoom: true,       // 启用双击缩放
+            keyboardEnable: true,        // 启用键盘操作
+            zoomEnable: true,             // 启用缩放控件
+            rotateEnable: true,          // 启用旋转
+            pitchEnable: true,            // 启用俯仰
             mapStyle: 'amap://styles/normal' // 使用标准样式
         });
         
@@ -317,18 +317,6 @@ function loadAddress() {
         chugeMarker.on('click', () => {
             chugeInfoWindow.open(chugeMap, chugeMarker.getPosition());
         });
-        
-        // 地图容器点击事件 - 跳转到高德地图app
-        chugeMapContainer.style.cursor = 'pointer';
-        chugeMapContainer.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openAmapApp(chugeLng, chugeLat, chugeName, chugeAddress);
-        });
-        
-        // 地图点击事件
-        chugeMap.on('click', () => {
-            openAmapApp(chugeLng, chugeLat, chugeName, chugeAddress);
-        });
     }
     
     // 初始化婚典之约地点地图（海口）
@@ -343,14 +331,14 @@ function loadAddress() {
             zoom: 16,
             center: [hunyanLng, hunyanLat], // 海口宝华海景大酒店坐标
             viewMode: '3D',
-            // 禁用所有交互
-            dragEnable: false,           // 禁用拖拽
-            scrollWheelZoom: false,      // 禁用滚轮缩放
-            doubleClickZoom: false,       // 禁用双击缩放
-            keyboardEnable: false,        // 禁用键盘操作
-            zoomEnable: false,            // 禁用缩放控件
-            rotateEnable: false,          // 禁用旋转
-            pitchEnable: false,           // 禁用俯仰
+            // 启用所有交互
+            dragEnable: true,            // 启用拖拽
+            scrollWheelZoom: true,       // 启用滚轮缩放
+            doubleClickZoom: true,       // 启用双击缩放
+            keyboardEnable: true,        // 启用键盘操作
+            zoomEnable: true,             // 启用缩放控件
+            rotateEnable: true,          // 启用旋转
+            pitchEnable: true,            // 启用俯仰
             mapStyle: 'amap://styles/normal' // 使用标准样式
         });
         
@@ -369,18 +357,6 @@ function loadAddress() {
         // 标记点击事件
         hunyanMarker.on('click', () => {
             hunyanInfoWindow.open(hunyanMap, hunyanMarker.getPosition());
-        });
-        
-        // 地图容器点击事件 - 跳转到高德地图app
-        hunyanMapContainer.style.cursor = 'pointer';
-        hunyanMapContainer.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openAmapApp(hunyanLng, hunyanLat, hunyanName, hunyanAddress);
-        });
-        
-        // 地图点击事件
-        hunyanMap.on('click', () => {
-            openAmapApp(hunyanLng, hunyanLat, hunyanName, hunyanAddress);
         });
     }
 }
