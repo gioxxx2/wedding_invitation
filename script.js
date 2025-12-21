@@ -230,16 +230,8 @@ function loadVideo() {
     // 视频加载错误处理
     video.onerror = function() {
         console.error('视频加载失败:', videoUrl);
-        // 尝试使用备用方案：直接使用Gitee raw链接
-        const fallbackUrl = getFallbackResourceUrl(`video/${videoFileName}`);
-        console.log('尝试备用URL (GitHub raw):', fallbackUrl);
-        // GitHub raw链接支持跨域，但为了兼容性不使用crossOrigin
-        video.src = fallbackUrl;
-        // 如果备用URL也失败，显示错误信息
-        video.onerror = function() {
-            console.error('备用URL也失败:', fallbackUrl);
-            videoContainer.innerHTML = '<div class="video-placeholder"><p>视频加载失败，请稍后重试</p></div>';
-        };
+        // 腾讯云COS地址，如果失败直接显示错误
+        videoContainer.innerHTML = '<div class="video-placeholder"><p>视频加载失败，请稍后重试</p><p style="font-size: 0.8rem; margin-top: 5px; color: #999;">请检查腾讯云COS配置</p></div>';
     };
     
     videoItem.appendChild(video);
