@@ -79,11 +79,11 @@ function getFallbackResourceUrl(path) {
     return `${GITHUB_RAW_BASE}/${path}`;
 }
 
-// 按顺序展示的图片（使用GitHub资源，1.jpg使用腾讯云COS）
+// 按顺序展示的图片（使用腾讯云COS）
 const selectedPhotos = [
-    'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/1.jpg', // 腾讯云COS
-    getResourceUrl('picture/2.jpg'),
-    getResourceUrl('picture/3.jpg')
+    'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/1.jpg',
+    'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/2.jpg',
+    'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/3.jpg'
 ];
 
 // 从GitHub仓库加载照片
@@ -210,13 +210,12 @@ function showPhotoModal(photoSrc) {
 // 视频展示功能
 const videoContainer = document.getElementById('video-container');
 
-// 从GitHub仓库加载视频
+// 从腾讯云COS加载视频
 function loadVideo() {
     if (!videoContainer) return;
     
-    // 视频文件名需要URL编码
-    const videoFileName = encodeURIComponent('徐智请柬无水印（2）.mp4');
-    const videoUrl = getResourceUrl(`video/${videoFileName}`); // GitHub资源地址
+    // 使用腾讯云COS地址
+    const videoUrl = 'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/%E5%BE%90%E6%99%BA%E8%AF%B7%E6%9F%AC%E6%97%A0%E6%B0%B4%E5%8D%B0%EF%BC%882%EF%BC%89.mp4';
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
@@ -412,14 +411,15 @@ if (isWeChatBrowser()) {
 }
 
 // 页面加载时初始化
-// 设置封面背景图片（带备用方案）
+// 设置封面背景图片（使用腾讯云COS）
 function setIntroBackground() {
     const introBg = document.querySelector('.intro-background-cover');
     if (!introBg) return;
     
-    const bgUrl = getResourceUrl('picture/4.jpg');
+    // 使用腾讯云COS地址
+    const bgUrl = 'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/4.jpg';
     
-    // 直接设置背景图片（本地用相对路径，线上用GitHub Pages）
+    // 直接设置背景图片
     introBg.style.backgroundImage = `url('${bgUrl}')`;
 }
 
