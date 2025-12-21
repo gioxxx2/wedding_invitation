@@ -110,8 +110,7 @@ function addPhotoToGallery(photoSrc) {
     photoItem.className = 'photo-item';
     
     const img = document.createElement('img');
-    // 添加跨域属性
-    img.crossOrigin = 'anonymous';
+    // Gitee raw链接不支持CORS，不使用crossOrigin属性
     img.src = photoSrc;
     img.alt = '婚礼照片';
     img.loading = 'lazy'; // 懒加载优化
@@ -135,8 +134,7 @@ function addPhotoToGallery(photoSrc) {
         const path = photoSrc.split('/').slice(-2).join('/'); // 获取 picture/1.jpg 这样的路径
         const fallbackUrl = getFallbackResourceUrl(path);
         console.log('尝试备用URL (Gitee raw):', fallbackUrl);
-        // 移除crossOrigin属性，因为raw.githubusercontent.com可能不支持CORS
-        img.removeAttribute('crossOrigin');
+        // Gitee raw链接不支持CORS，不使用crossOrigin属性
         img.src = fallbackUrl;
         // 如果备用URL也失败，显示占位图
         img.onerror = function() {
@@ -222,7 +220,7 @@ function loadVideo() {
     videoItem.className = 'video-item';
     
     const video = document.createElement('video');
-    video.crossOrigin = 'anonymous';
+    // Gitee raw链接不支持CORS，不使用crossOrigin属性
     video.src = videoUrl;
     video.controls = true;
     video.playsInline = true; // 移动端内联播放
@@ -234,8 +232,7 @@ function loadVideo() {
         // 尝试使用备用方案：直接使用Gitee raw链接
         const fallbackUrl = getFallbackResourceUrl(`video/${videoFileName}`);
         console.log('尝试备用URL (Gitee raw):', fallbackUrl);
-        // 移除crossOrigin属性
-        video.removeAttribute('crossOrigin');
+        // Gitee raw链接不支持CORS，不使用crossOrigin属性
         video.src = fallbackUrl;
         // 如果备用URL也失败，显示错误信息
         video.onerror = function() {
