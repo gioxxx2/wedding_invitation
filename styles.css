@@ -99,12 +99,6 @@ body {
     animation: backgroundZoom 20s ease-in-out infinite alternate;
 }
 
-@media (max-width: 768px) {
-    .intro-background-cover {
-        background-size: cover;
-        background-position: center center;
-    }
-}
 
 @keyframes backgroundZoom {
     0% {
@@ -1266,21 +1260,48 @@ body {
     /* 封面部分移动端优化 */
     .introduction {
         min-height: 100vh;
-        padding: 20px 10px;
+        height: auto;
+        padding: 15px 10px;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .intro-background-cover {
+        background-size: cover;
+        background-position: center center;
+        min-height: 100vh;
+        height: 100vh;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
     .intro-content {
-        padding: 10px 0;
+        padding: 15px 0;
         width: 100%;
         max-width: 100%;
+        position: relative;
+        z-index: 2;
+        box-sizing: border-box;
+        min-height: calc(100vh - 30px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .introduction .container {
         padding: 0 10px;
         width: 100%;
+        height: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
     }
 
     .invitation-poem {
