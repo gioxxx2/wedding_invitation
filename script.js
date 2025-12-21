@@ -48,12 +48,24 @@ const GITHUB_USER = 'gioxxx2';
 const GITHUB_REPO = 'wedding_invitation';
 const GITHUB_BRANCH = 'main';
 const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
+// 备用方案：直接使用GitHub raw链接
+const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
+
+// 获取资源URL（优先使用CDN，失败时使用raw）
+function getResourceUrl(path) {
+    return `${CDN_BASE}/${path}`;
+}
+
+// 获取备用资源URL
+function getFallbackResourceUrl(path) {
+    return `${RAW_BASE}/${path}`;
+}
 
 // 按顺序展示的图片（使用jsDelivr CDN）
 const selectedPhotos = [
-    `${CDN_BASE}/picture/1.jpg`,
-    `${CDN_BASE}/picture/2.jpg`,
-    `${CDN_BASE}/picture/3.jpg`
+    getResourceUrl('picture/1.jpg'),
+    getResourceUrl('picture/2.jpg'),
+    getResourceUrl('picture/3.jpg')
 ];
 
 // 从七牛云CDN加载照片
@@ -82,6 +94,8 @@ function addPhotoToGallery(photoSrc) {
     photoItem.className = 'photo-item';
     
     const img = document.createElement('img');
+    // 添加跨域属性
+    img.crossOrigin = 'anonymous';
     img.src = photoSrc;
     img.alt = '婚礼照片';
     img.loading = 'lazy'; // 懒加载优化
@@ -101,13 +115,23 @@ function addPhotoToGallery(photoSrc) {
     // 图片加载错误处理
     img.onerror = function() {
         console.error('图片加载失败:', photoSrc);
-        // 显示占位图
-        photoItem.innerHTML = `
-            <div class="photo-placeholder-error">
-                <div class="placeholder-icon">📷</div>
-                <p class="placeholder-text">图片加载失败</p>
-            </div>
-        `;
+        // 尝试使用备用方案：直接使用GitHub raw链接
+        const path = photoSrc.split('/').slice(-2).join('/'); // 获取 picture/1.jpg 这样的路径
+        const fallbackUrl = getFallbackResourceUrl(path);
+        console.log('尝试备用URL:', fallbackUrl);
+        // 移除crossOrigin属性，因为raw.githubusercontent.com可能不支持CORS
+        img.removeAttribute('crossOrigin');
+        img.src = fallbackUrl;
+        // 如果备用URL也失败，显示占位图
+        img.onerror = function() {
+            console.error('备用URL也失败:', fallbackUrl);
+            photoItem.innerHTML = `
+                <div class="photo-placeholder-error">
+                    <div class="placeholder-icon">📷</div>
+                    <p class="placeholder-text">图片加载失败</p>
+                </div>
+            `;
+        };
     };
     
     // 点击照片查看大图
@@ -176,12 +200,13 @@ function loadVideo() {
     
     // 视频文件名需要URL编码
     const videoFileName = encodeURIComponent('徐智请柬无水印（2）.mp4');
-    const videoUrl = `${CDN_BASE}/video/${videoFileName}`; // jsDelivr CDN地址
+    const videoUrl = getResourceUrl(`video/${videoFileName}`); // jsDelivr CDN地址
     
     const videoItem = document.createElement('div');
     videoItem.className = 'video-item';
     
     const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
     video.src = videoUrl;
     video.controls = true;
     video.playsInline = true; // 移动端内联播放
@@ -190,7 +215,17 @@ function loadVideo() {
     // 视频加载错误处理
     video.onerror = function() {
         console.error('视频加载失败:', videoUrl);
-        videoContainer.innerHTML = '<div class="video-placeholder"><p>视频加载失败，请稍后重试</p></div>';
+        // 尝试使用备用方案：直接使用GitHub raw链接
+        const fallbackUrl = getFallbackResourceUrl(`video/${videoFileName}`);
+        console.log('尝试备用URL:', fallbackUrl);
+        // 移除crossOrigin属性
+        video.removeAttribute('crossOrigin');
+        video.src = fallbackUrl;
+        // 如果备用URL也失败，显示错误信息
+        video.onerror = function() {
+            console.error('备用URL也失败:', fallbackUrl);
+            videoContainer.innerHTML = '<div class="video-placeholder"><p>视频加载失败，请稍后重试</p></div>';
+        };
     };
     
     videoItem.appendChild(video);
@@ -362,7 +397,30 @@ if (isWeChatBrowser()) {
 }
 
 // 页面加载时初始化
+// 设置封面背景图片（带备用方案）
+function setIntroBackground() {
+    const introBg = document.querySelector('.intro-background-cover');
+    if (!introBg) return;
+    
+    const cdnUrl = getResourceUrl('picture/4.jpg');
+    const rawUrl = getFallbackResourceUrl('picture/4.jpg');
+    
+    // 先尝试CDN
+    const testImg = new Image();
+    testImg.onload = function() {
+        introBg.style.backgroundImage = `url('${cdnUrl}')`;
+    };
+    testImg.onerror = function() {
+        // CDN失败，使用raw链接
+        console.log('CDN背景图片加载失败，使用备用URL:', rawUrl);
+        introBg.style.backgroundImage = `url('${rawUrl}')`;
+    };
+    testImg.src = cdnUrl;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // 设置封面背景图片
+    setIntroBackground();
     // 从GitHub仓库加载图片和视频
     loadPhotos();
     loadVideo();
