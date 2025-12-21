@@ -33,10 +33,10 @@ jobs:
           # 创建配置目录
           mkdir -p ~/.cos
           # 创建配置文件（注意：.cos.yaml是文件，不是目录）
-          cat > ~/.cos.yaml << EOF
+          cat > ~/.cos.yaml << 'EOF'
           base:
-            secretid: $SECRET_ID
-            secretkey: $SECRET_KEY
+            secretid: ${SECRET_ID}
+            secretkey: ${SECRET_KEY}
             sessiontoken: ""
             protocol: https
             timeout: 60
@@ -45,11 +45,13 @@ jobs:
             - name: wedding-1303923554
               alias: wedding-1303923554
               region: ap-guangzhou
-              endpoint: cos.ap-guangzhou.myqcloud.com
           EOF
+          # 替换环境变量
+          sed -i "s|\${SECRET_ID}|$SECRET_ID|g" ~/.cos.yaml
+          sed -i "s|\${SECRET_KEY}|$SECRET_KEY|g" ~/.cos.yaml
           echo "✅ COS CLI配置完成"
-          # 验证配置文件
-          cat ~/.cos.yaml
+          # 验证配置文件（隐藏敏感信息）
+          sed 's/secretid:.*/secretid: ***/g; s/secretkey:.*/secretkey: ***/g' ~/.cos.yaml
 
       - name: Sync files to COS
         env:
