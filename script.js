@@ -648,9 +648,16 @@ async function saveGuestData(guestData) {
     let guests = JSON.parse(localStorage.getItem('weddingGuests') || '[]');
     guests.push(guestData);
     localStorage.setItem('weddingGuests', JSON.stringify(guests));
+    console.log('✅ 数据已保存到本地存储，共', guests.length, '条记录');
     
     // 尝试保存到GitHub（如果配置了token）
-    await saveToGitHub(guests);
+    const githubToken = localStorage.getItem('githubToken');
+    if (githubToken) {
+        console.log('🔑 检测到GitHub Token，开始同步到GitHub...');
+        await saveToGitHub(guests);
+    } else {
+        console.warn('⚠️ 未设置GitHub Token，数据只保存到本地。点击"🔑 设置GitHub保存"按钮可启用GitHub同步。');
+    }
 }
 
 // 保存数据到GitHub
@@ -658,6 +665,7 @@ async function saveToGitHub(guests) {
     const githubToken = localStorage.getItem('githubToken');
     if (!githubToken) {
         // 如果没有配置token，只保存到本地
+        console.warn('⚠️ 未设置GitHub Token，跳过GitHub同步');
         return;
     }
     
@@ -666,6 +674,8 @@ async function saveToGitHub(guests) {
         const filePath = 'data/guests.json';
         const content = JSON.stringify(guests, null, 2);
         const encodedContent = btoa(unescape(encodeURIComponent(content)));
+        
+        console.log('📤 准备保存', guests.length, '条记录到GitHub...');
         
         // 先获取文件SHA（如果存在）
         let sha = null;
@@ -679,18 +689,24 @@ async function saveToGitHub(guests) {
             if (getResponse.ok) {
                 const fileData = await getResponse.json();
                 sha = fileData.sha;
+                console.log('📋 获取到现有文件的SHA:', sha.substring(0, 10) + '...');
             } else if (getResponse.status === 404) {
                 // 文件不存在，继续创建新文件
-                console.log('文件不存在，将创建新文件');
+                console.log('📄 文件不存在，将创建新文件');
             } else {
                 const errorText = await getResponse.text();
-                console.error('获取文件失败:', getResponse.status, errorText);
+                console.error('❌ 获取文件失败:', getResponse.status, errorText);
+                showGitHubSaveError(getResponse.status, `获取文件失败: ${errorText}`);
+                return;
             }
         } catch (e) {
-            console.error('获取文件出错:', e);
+            console.error('❌ 获取文件出错:', e);
+            showGitHubSaveError('网络错误', `获取文件出错: ${e.message}`);
+            return;
         }
         
         // 创建或更新文件
+        console.log('💾 正在上传到GitHub...');
         const response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
             method: 'PUT',
             headers: {
@@ -713,11 +729,18 @@ async function saveToGitHub(guests) {
         } else {
             const errorText = await response.text();
             console.error('❌ 保存到GitHub失败:', response.status, errorText);
+            let errorMessage = errorText;
+            try {
+                const errorJson = JSON.parse(errorText);
+                errorMessage = errorJson.message || errorText;
+            } catch (e) {
+                // 如果不是JSON，直接使用原文本
+            }
             // 显示错误提示
-            showGitHubSaveError(response.status, errorText);
+            showGitHubSaveError(response.status, errorMessage);
         }
     } catch (error) {
-        console.error('保存到GitHub出错:', error);
+        console.error('❌ 保存到GitHub出错:', error);
         showGitHubSaveError('网络错误', error.message);
     }
 }
