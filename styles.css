@@ -99,7 +99,6 @@ body {
     background-size: cover;
     background-position: 55% center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
     animation: backgroundZoom 20s ease-in-out infinite alternate;
 }
 
