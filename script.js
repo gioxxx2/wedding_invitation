@@ -45,7 +45,7 @@ const photoGallery = document.getElementById('photo-gallery');
 
 // GitHub仓库 + jsDelivr CDN配置（支持HTTPS）
 const GITHUB_USER = 'gioxxx2';
-const GITHUB_REPO = 'wedding';
+const GITHUB_REPO = 'wedding_invitation';
 const GITHUB_BRANCH = 'main';
 const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
 
