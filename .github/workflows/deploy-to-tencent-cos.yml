@@ -13,14 +13,75 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Tencent COS
+      - name: Deploy to Tencent COS (excluding video)
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          args: upload -rs ./ cos://wedding-1303923554/ --ignore '.*\.git.*'
+          args: upload -rs ./ cos://wedding-1303923554/ --ignore '.*\.git.*|^video/.*'
           secret_id: ${{ secrets.TENCENT_SECRET_ID }}
           secret_key: ${{ secrets.TENCENT_SECRET_KEY }}
           bucket: wedding-1303923554
           region: ap-guangzhou
+
+      - name: Deploy video files with retry
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+        run: |
+          # 安装Python和COS SDK
+          pip3 install cos-python-sdk-v5
+          
+          # 使用Python脚本上传视频文件，带重试机制
+          python3 << 'EOF'
+          from qcloud_cos import CosConfig
+          from qcloud_cos import CosS3Client
+          import os
+          import time
+          
+          secret_id = os.environ['SECRET_ID']
+          secret_key = os.environ['SECRET_KEY']
+          region = 'ap-guangzhou'
+          bucket = 'wedding-1303923554'
+          
+          config = CosConfig(
+              Region=region, 
+              SecretId=secret_id, 
+              SecretKey=secret_key,
+              Timeout=300,  # 增加超时时间到5分钟
+              ChunkSize=10 * 1024 * 1024,  # 10MB分片
+              MaxThread=5  # 多线程上传
+          )
+          client = CosS3Client(config)
+          
+          # 上传视频文件，带重试机制
+          video_file = 'video/徐智请柬无水印（2）.mp4'
+          max_retries = 3
+          
+          if os.path.exists(video_file):
+              for attempt in range(max_retries):
+                  try:
+                      print(f"📤 尝试上传视频文件 (第 {attempt + 1}/{max_retries} 次)...")
+                      response = client.upload_file(
+                          Bucket=bucket,
+                          LocalFilePath=video_file,
+                          Key=video_file,
+                          PartSize=10 * 1024 * 1024,  # 10MB分片
+                          MAXThread=5,  # 5个线程并发上传
+                          EnableMD5=False
+                      )
+                      print(f"✅ 视频文件上传成功！ETag: {response.get('ETag', 'N/A')}")
+                      break
+                  except Exception as e:
+                      print(f"❌ 第 {attempt + 1} 次上传失败: {e}")
+                      if attempt < max_retries - 1:
+                          wait_time = (attempt + 1) * 30  # 等待时间递增：30秒、60秒、90秒
+                          print(f"⏳ 等待 {wait_time} 秒后重试...")
+                          time.sleep(wait_time)
+                      else:
+                          print(f"⚠️ 视频文件上传失败，已重试 {max_retries} 次")
+                          print("💡 提示：视频文件较大，可以稍后手动上传或使用其他方式上传")
+          else:
+              print(f"ℹ️ 视频文件不存在: {video_file}")
+          EOF
 
       - name: Set Content-Type for files
         env:
