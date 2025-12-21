@@ -707,7 +707,9 @@ async function saveToGitHub(guests) {
         
         // 创建或更新文件
         console.log('💾 正在上传到GitHub...');
-        const response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+        
+        // 微信浏览器特殊处理：添加超时和重试机制
+        const fetchOptions = {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${githubToken}`,
@@ -719,7 +721,21 @@ async function saveToGitHub(guests) {
                 content: encodedContent,
                 sha: sha
             })
-        });
+        };
+        
+        // 如果是微信浏览器，添加超时控制
+        if (isWeChatBrowser()) {
+            console.log('📱 检测到微信浏览器，使用特殊处理');
+            // 使用Promise.race实现超时
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('请求超时')), 30000); // 30秒超时
+            });
+            
+            const fetchPromise = fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, fetchOptions);
+            var response = await Promise.race([fetchPromise, timeoutPromise]);
+        } else {
+            var response = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, fetchOptions);
+        }
         
         if (response.ok) {
             const result = await response.json();
