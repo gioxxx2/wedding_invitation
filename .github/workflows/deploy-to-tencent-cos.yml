@@ -30,8 +30,9 @@ jobs:
           SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
         run: |
-          # 创建配置文件
-          mkdir -p ~/.cos.yaml
+          # 创建配置目录
+          mkdir -p ~/.cos
+          # 创建配置文件（注意：.cos.yaml是文件，不是目录）
           cat > ~/.cos.yaml << EOF
           base:
             secretid: $SECRET_ID
@@ -47,6 +48,8 @@ jobs:
               endpoint: cos.ap-guangzhou.myqcloud.com
           EOF
           echo "✅ COS CLI配置完成"
+          # 验证配置文件
+          cat ~/.cos.yaml
 
       - name: Sync files to COS
         env:
