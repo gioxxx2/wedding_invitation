@@ -77,8 +77,9 @@ body {
     color: var(--white);
     text-align: center;
     position: relative;
-    overflow: hidden;
-    background: #000;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(135deg, #2c1810 0%, #1a0f08 50%, #0d0604 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -99,7 +100,11 @@ body {
     background-size: cover;
     background-position: 55% center;
     background-repeat: no-repeat;
+    background-color: #1a0f08;
     animation: backgroundZoom 20s ease-in-out infinite alternate;
+    /* 确保背景图片加载时平滑过渡 */
+    transition: opacity 0.3s ease;
+    opacity: 1;
 }
 
 
@@ -1219,11 +1224,11 @@ body {
         min-height: 100vh;
         height: auto;
         padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: visible;
+        display: block;
+        overflow-y: auto;
+        overflow-x: hidden;
         position: relative;
+        -webkit-overflow-scrolling: touch;
     }
 
     .intro-background-cover {
@@ -1250,6 +1255,8 @@ body {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .introduction .container {
@@ -1262,6 +1269,8 @@ body {
         box-sizing: border-box;
         position: relative;
         z-index: 2;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .invitation-poem {
