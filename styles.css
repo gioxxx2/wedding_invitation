@@ -376,7 +376,11 @@ body {
 
 /* 照片部分样式 */
 .photos {
-    background: transparent;
+    background: linear-gradient(135deg, #fef5e7 0%, #ffe8d6 50%, #f5e6d3 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite;
+    position: relative;
+    z-index: 1;
 }
 
 .section-header {
