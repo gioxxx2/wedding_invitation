@@ -89,13 +89,17 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
     height: 100%;
     z-index: 0;
-    background-image: url('https://gioxxx2.gitee.io/wedding_invitation/picture/4.jpg');
+    /* 背景图片 - 使用JavaScript动态设置，本地用相对路径，线上用Gitee raw链接 */
+    background-image: url('./picture/4.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: 55% center;
     background-repeat: no-repeat;
+    background-attachment: fixed;
     animation: backgroundZoom 20s ease-in-out infinite alternate;
 }
 
@@ -1289,8 +1293,9 @@ body {
     /* 封面部分移动端优化 */
     .introduction {
         min-height: 100vh;
-        height: auto;
-        padding: 15px 10px;
+        height: 100vh;
+        max-height: 100vh;
+        padding: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1300,26 +1305,27 @@ body {
 
     .intro-background-cover {
         background-size: cover;
-        background-position: center center;
+        background-position: 42% center;
         min-height: 100vh;
         height: 100vh;
-        width: 100%;
-        position: absolute;
+        width: 100vw;
+        position: fixed;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
     }
 
     .intro-content {
-        padding: 15px 0;
+        padding: 20px 15px;
         width: 100%;
         max-width: 100%;
+        max-height: 100vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         position: relative;
         z-index: 2;
         box-sizing: border-box;
-        min-height: calc(100vh - 30px);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
     }
     
     .introduction .container {
@@ -1327,10 +1333,12 @@ body {
         width: 100%;
         height: 100%;
         min-height: 100vh;
+        max-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
+        overflow: hidden;
     }
 
     .invitation-poem {
