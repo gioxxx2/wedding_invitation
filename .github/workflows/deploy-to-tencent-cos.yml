@@ -16,11 +16,57 @@ jobs:
       - name: Deploy to Tencent COS (excluding video)
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          args: upload -rs ./ cos://wedding-1303923554/ --ignore '.*\.git.*|^video/.*'
+          args: upload -rs ./ cos://wedding-1303923554/ --ignore '.*\.git.*|^video/.*|^\.github/.*|^.*\.md$'
           secret_id: ${{ secrets.TENCENT_SECRET_ID }}
           secret_key: ${{ secrets.TENCENT_SECRET_KEY }}
           bucket: wedding-1303923554
           region: ap-guangzhou
+
+      - name: Verify uploaded files
+        env:
+          SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+        run: |
+          # 安装Python和COS SDK
+          pip3 install cos-python-sdk-v5
+          
+          # 验证文件是否上传成功
+          python3 << 'EOF'
+          from qcloud_cos import CosConfig
+          from qcloud_cos import CosS3Client
+          import os
+          
+          secret_id = os.environ['SECRET_ID']
+          secret_key = os.environ['SECRET_KEY']
+          region = 'ap-guangzhou'
+          bucket = 'wedding-1303923554'
+          
+          config = CosConfig(Region=region, SecretId=secret_id, SecretKey=secret_key)
+          client = CosS3Client(config)
+          
+          # 检查关键文件是否存在
+          files_to_check = ['index.html', 'styles.css', 'script.js', 'data-viewer.html']
+          
+          print("🔍 检查文件是否上传成功...")
+          for file in files_to_check:
+              try:
+                  response = client.head_object(Bucket=bucket, Key=file)
+                  print(f"✅ {file} - 存在 (大小: {response.get('Content-Length', 'N/A')} 字节)")
+              except Exception as e:
+                  print(f"❌ {file} - 不存在或无法访问: {e}")
+          
+          # 列出根目录的文件
+          try:
+              response = client.list_objects(Bucket=bucket, MaxKeys=20)
+              if 'Contents' in response:
+                  print(f"\n📁 存储桶中的文件列表（前20个）:")
+                  for obj in response['Contents']:
+                      print(f"  - {obj['Key']} ({obj['Size']} 字节)")
+              else:
+                  print("\n⚠️ 存储桶为空或无法访问")
+          except Exception as e:
+              print(f"\n❌ 无法列出文件: {e}")
+          EOF
 
       - name: Deploy video files with retry
         env:
