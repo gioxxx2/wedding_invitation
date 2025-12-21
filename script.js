@@ -265,8 +265,22 @@ function setIntroBackground() {
     // 使用腾讯云COS地址
     const bgUrl = 'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/4.jpg';
     
-    // 直接设置背景图片
-    introBg.style.backgroundImage = `url('${bgUrl}')`;
+    // 预加载图片，确保图片加载完成后再显示
+    const img = new Image();
+    img.onload = function() {
+        introBg.style.backgroundImage = `url('${bgUrl}')`;
+        // 直接设置为1，不使用过渡，避免快速滚动时闪烁
+        introBg.style.opacity = '1';
+    };
+    img.onerror = function() {
+        // 如果加载失败，保持默认背景
+        console.warn('背景图片加载失败，使用默认背景');
+        introBg.style.opacity = '1';
+    };
+    img.src = bgUrl;
+    
+    // 设置初始透明度为1，避免闪烁
+    introBg.style.opacity = '1';
 }
 
 document.addEventListener('DOMContentLoaded', () => {

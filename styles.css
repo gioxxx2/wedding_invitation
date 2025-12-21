@@ -101,10 +101,13 @@ body {
     background-position: 55% center;
     background-repeat: no-repeat;
     background-color: #1a0f08;
-    animation: backgroundZoom 20s ease-in-out infinite alternate;
-    /* 确保背景图片加载时平滑过渡 */
-    transition: opacity 0.3s ease;
-    opacity: 1;
+    /* 移除动画，避免与滚动冲突 */
+    /* animation: backgroundZoom 20s ease-in-out infinite alternate; */
+    /* 移除透明度过渡，直接设置为1，避免闪烁 */
+    opacity: 1 !important;
+    /* 优化渲染性能 */
+    will-change: auto;
+    transform: translateZ(0);
 }
 
 
@@ -159,9 +162,14 @@ body {
 }
 
 .intro-content {
-    animation: fadeInUp 1s ease-out;
+    /* 移除动画，确保文字始终可见 */
+    /* animation: fadeInUp 1s ease-out; */
     position: relative;
     z-index: 2;
+    /* 确保文字始终可见 */
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
 }
 
 .invitation-poem p {
@@ -1235,13 +1243,17 @@ body {
         background-size: cover;
         background-position: 42% center;
         min-height: 100vh;
-        height: 100%;
+        /* 修复：使用 min-height 而不是 height: 100%，确保背景始终覆盖 */
+        height: auto;
         width: 100%;
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        /* 确保背景始终可见 */
+        opacity: 1 !important;
+        transform: translateZ(0);
     }
 
     .intro-content {
@@ -1255,8 +1267,13 @@ body {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        /* 移除内部滚动，使用外层滚动 */
+        /* overflow-y: auto; */
+        /* -webkit-overflow-scrolling: touch; */
+        /* 确保文字始终可见 */
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
     }
     
     .introduction .container {
@@ -1269,8 +1286,9 @@ body {
         box-sizing: border-box;
         position: relative;
         z-index: 2;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        /* 移除内部滚动，使用外层滚动 */
+        /* overflow-y: auto; */
+        /* -webkit-overflow-scrolling: touch; */
     }
 
     .invitation-poem {
