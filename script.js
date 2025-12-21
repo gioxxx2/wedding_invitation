@@ -44,7 +44,7 @@ window.addEventListener('scroll', () => {
 const photoGallery = document.getElementById('photo-gallery');
 
 // 七牛云CDN配置
-const QINIU_CDN_BASE = 'http://t7lml0iwa.hn-bkt.clouddn.com';
+const QINIU_CDN_BASE = 'https://t7lml0iwa.hn-bkt.clouddn.com';
 
 // 按顺序展示的图片（使用七牛云CDN）
 const selectedPhotos = [
