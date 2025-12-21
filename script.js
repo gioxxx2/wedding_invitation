@@ -79,9 +79,9 @@ function getFallbackResourceUrl(path) {
     return `${GITHUB_RAW_BASE}/${path}`;
 }
 
-// 按顺序展示的图片（使用GitHub资源）
+// 按顺序展示的图片（使用GitHub资源，1.jpg使用腾讯云COS）
 const selectedPhotos = [
-    getResourceUrl('picture/1.jpg'),
+    'https://wedding-1303923554.cos.ap-guangzhou.myqcloud.com/wedding_invitation/1.jpg', // 腾讯云COS
     getResourceUrl('picture/2.jpg'),
     getResourceUrl('picture/3.jpg')
 ];
