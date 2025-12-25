@@ -332,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 来宾信息收集功能
-const rsvpForm = document.getElementById('rsvp-form');
 const danmakuContainer = document.getElementById('danmaku-container');
 
 // 初始化RSVP功能
@@ -343,9 +342,15 @@ function initRSVP() {
     // 检查是否是管理员（有GitHub Token的用户）
     checkAdminStatus();
     
-    // 表单提交处理
-    if (rsvpForm) {
-        rsvpForm.addEventListener('submit', handleRSVPSubmit);
+    // 问卷按钮点击处理
+    const surveyBtn = document.getElementById('survey-btn');
+    if (surveyBtn) {
+        surveyBtn.addEventListener('click', () => {
+            // 获取腾讯问卷链接（优先使用配置的，否则使用默认链接）
+            const surveyUrl = localStorage.getItem('tencentSurveyUrl') || 'https://wj.qq.com/s2/25294690/4365/';
+            // 跳转到腾讯问卷（新窗口打开）
+            window.open(surveyUrl, '_blank');
+        });
     }
 }
 
@@ -360,53 +365,6 @@ function checkAdminStatus() {
     } else if (adminActions) {
         adminActions.style.display = 'none';
     }
-}
-
-// 处理表单提交
-function handleRSVPSubmit(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(rsvpForm);
-    const guestData = {
-        name: formData.get('name'),
-        phone: formData.get('phone'),
-        count: formData.get('count'),
-        location: formData.get('location'),
-        blessing: formData.get('blessing') || '',
-        timestamp: new Date().toISOString()
-    };
-    
-    // 先保存到本地（用于弹幕和本地查看）
-    saveGuestDataLocal(guestData);
-    
-    // 如果有祝福语，显示弹幕
-    if (guestData.blessing.trim()) {
-        showDanmaku(guestData.blessing, guestData.name);
-    }
-    
-    // 获取腾讯问卷链接（优先使用配置的，否则使用默认链接）
-    const surveyUrl = localStorage.getItem('tencentSurveyUrl') || 'https://wj.qq.com/s2/25294690/4365/';
-    
-    // 跳转到腾讯问卷
-    // 显示提示信息
-    showSuccessMessage('正在跳转到腾讯问卷...');
-    
-    // 延迟跳转，让用户看到提示
-    setTimeout(() => {
-        // 跳转到腾讯问卷（新窗口打开）
-        window.open(surveyUrl, '_blank');
-    }, 1500);
-    
-    // 同时尝试保存到GitHub（如果配置了token，作为备份）
-    const githubToken = localStorage.getItem('githubToken');
-    if (githubToken) {
-        saveGuestData(guestData).catch(err => {
-            console.error('保存数据到GitHub出错:', err);
-        });
-    }
-    
-    // 重置表单
-    rsvpForm.reset();
 }
 
 // 保存到本地存储（用于弹幕和本地查看）

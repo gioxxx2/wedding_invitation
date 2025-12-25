@@ -145,47 +145,14 @@
                 <p class="section-subtitle">请填写以下信息，方便我们为您安排座位</p>
             </div>
             <div class="rsvp-content">
-                <form id="rsvp-form" class="rsvp-form">
-                    <div class="form-group">
-                        <label for="guest-name">姓名 <span class="required">*</span></label>
-                        <input type="text" id="guest-name" name="name" required placeholder="请输入您的姓名">
-                    </div>
-                    <div class="form-group">
-                        <label for="guest-phone">电话 <span class="required">*</span></label>
-                        <input type="tel" id="guest-phone" name="phone" required placeholder="请输入您的联系电话">
-                    </div>
-                    <div class="form-group">
-                        <label for="guest-count">参加人数 <span class="required">*</span></label>
-                        <select id="guest-count" name="count" required>
-                            <option value="">请选择参加人数</option>
-                            <option value="1">1人</option>
-                            <option value="2">2人</option>
-                            <option value="3">3人</option>
-                            <option value="4">4人</option>
-                            <option value="5">5人及以上</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="guest-location">参加地点 <span class="required">*</span></label>
-                        <select id="guest-location" name="location" required>
-                            <option value="">请选择参加地点</option>
-                            <option value="深圳">深圳（出阁之喜）</option>
-                            <option value="海口">海口（婚典之约）</option>
-                            <option value="都有">都有</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="guest-blessing">祝福语 <span class="optional">(选填)</span></label>
-                        <textarea id="guest-blessing" name="blessing" rows="4" placeholder="写下您对我们的祝福吧..."></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn">
-                        <span class="submit-icon">💝</span>
-                        <span class="submit-text">提交信息</span>
+                <div class="rsvp-button-container">
+                    <button id="survey-btn" class="survey-btn">
+                        <span class="survey-icon">📝</span>
+                        <span class="survey-text">填写出席信息</span>
                     </button>
-                </form>
-                <div class="rsvp-info">
-                    <p class="info-text">您的信息将被保存到腾讯问卷中</p>
-                    <div class="rsvp-actions" id="admin-actions" style="display: none;">
+                    <p class="rsvp-hint">点击按钮跳转到腾讯问卷填写信息</p>
+                </div>
+                <div class="rsvp-actions" id="admin-actions" style="display: none;">
                         <button onclick="setTencentSurveyUrl()" class="table-link" style="margin-left: 10px; border: none; cursor: pointer;">
                             <span>⚙️ 设置腾讯问卷链接</span>
                         </button>
